@@ -1,6 +1,6 @@
 # Smart Loan Recovery System
 
-A Machine Learning-powered solution to optimize loan recovery strategies by predicting the most effective collection method for each borrower — reducing defaults, legal costs, and manual effort.
+A Machine Learning-powered solution to optimize loan recovery strategies by predicting the most effective collection method for each borrower, reducing defaults, legal costs, and manual effort.
 
 ---
 
@@ -27,11 +27,11 @@ The system:
 
 ## Tech Stack
 
-- **Python**, **Pandas**, **NumPy**, **Matplotlib**, **Seaborn**
+- **Python**, **Pandas**, **NumPy**, **Plotly**
 - **XGBoost**, **Random Forest**, **KMeans**
 - **Streamlit** for app deployment
 - **Scikit-learn** for preprocessing and modeling
-- **Joblib** for model serialization
+- **Pickle** for model serialization
 
 ---
 
