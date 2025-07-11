@@ -1,66 +1,57 @@
 Smart Loan Recovery System
-======================================================
+=========================
 
-Objective
----------
-To build an intelligent, data-driven system that helps financial institutions recover loans more efficiently by predicting the best recovery strategy for each borrower using machine learning.
+A professional Streamlit dashboard for loan risk assessment, borrower analytics, and AI-powered recovery strategy recommendations. Includes robust UI/UX, PDF report generation, model explainability, and a business-grade contact form with Google Sheets integration.
 
-The Real-World Problem
-----------------------
-Loan defaults are a major financial burden for lending institutions. Traditional recovery methods are often manual, reactive, and one-size-fits-all, leading to:
-- Wasted time and legal expenses.
-- Delayed interventions.
-- Poor recovery rates.
-- High dependency on subjective decision-making by recovery agents.
+Features
+--------
+- Smart Risk Predictor: Enter borrower details to predict risk of default and receive tailored recovery strategies. Auto-calculated fields (EMI, DPD, Collection Attempts, etc.). Robust validation (0 is valid for all fields). Professional, color-coded PDF report download with unique borrower ID. User-friendly error handling (no Python tracebacks).
 
-Our Approach
-------------
-1. Data-Driven Decision Making:
-   - The system uses borrower profile data, loan information, payment history, and previous recovery actions to make informed decisions.
+- Recovery Insights Dashboard: Visualizes borrower details, risk, and strategy in a modern dashboard. Analytical charts: EMI/Income, Collateral Coverage, Payment History, Risk Gauge. SHAP value visualization for model explainability. Dynamic, plain-language Insights Summary (SHAP + business logic). Graph-themed background for visual appeal.
 
-2. Predictive Modeling:
-   - Built ML models (XGBoost, Random Forest) to classify borrowers by default risk and predict the most effective recovery strategy (e.g., follow-up, legal action, settlement).
+- Contact Us: Business-grade contact form with required field and consent validation. Google Sheets integration for message storage. Custom-styled input fields matching app branding.
 
-3. Feature Engineering:
-   - Created actionable features such as EMI-to-Income Ratio, Collateral Coverage, Missed Payment Flags, and Default Severity.
+- Branding & UI: Custom sidebar and header with Flaticon icons. Modern, responsive CSS and layout.
 
-4. Clustering and Segmentation:
-   - Used KMeans to segment borrowers based on risk and profile, enabling personalized recovery plans.
+Setup Instructions
+------------------
+1. Clone the repository or copy the project files.
+2. Install dependencies:
+   pip install -r requirements.txt
+3. Google Sheets Integration:
+   - Place your Google Service Account JSON key in 'Google Sheets API/' (update filename in code if needed).
+   - Share your target Google Sheet with the service account email.
+4. Run the app:
+   streamlit run app1.py
+5. Usage:
+   - Use the sidebar to navigate between Smart Risk Predictor, Recovery Insights, and Contact Us.
+   - Fill in borrower details and click Predict to view results and download the PDF report.
+   - View analytics and SHAP explanations in Recovery Insights.
+   - Use Contact Us for support, demo requests, or feedback.
 
-5. Legal Action Strategy:
-   - Integrated logic to suggest legal escalation only when risk is high and no prior action has been taken, optimizing costs.
+File Structure
+--------------
+- slrs.py — Main Streamlit app
+- requirements.txt — Python dependencies
+- Google Sheets API/ — Service account JSON for Google Sheets
+- Notebooks & Strategy/, PKL Files/ — Model and feature files
+- Dataset/ — Sample data
+- Project Documents/ — Notes and workflow docs
 
-6. Streamlit Dashboard:
-   - Built an interactive app where lenders can:
-     • Input borrower details
-     • Get real-time strategy suggestions
-     • Visualize segment-wise loan portfolio insights
-     • Track key metrics and model performance
+Model & Explainability
+---------------------
+- XGBoost model for risk prediction (pickle file required)
+- SHAP for model explainability (waterfall plot and plain-language insights)
 
-Outcome
--------
-- Improved recovery rates by targeting the right borrowers with the right strategy at the right time.
-- Reduced legal and operational costs through smarter interventions.
-- Enabled transparent and explainable AI for finance teams.
-- Saved time for loan officers by automating strategy recommendations.
-
-Ideal Users
+PDF Reports
 -----------
-- Banks
-- NBFCs (Non-Banking Financial Companies)
-- Loan recovery agencies
-- FinTech platforms
+- Downloadable, color-coded, professional PDF for each borrower
+- Unique, robust borrower ID (no emoji or unsupported symbols)
 
-Future Scope
-------------
-- Add pre-default alert systems.
-- Automate SMS/email reminders to borrowers.
-- Introduce reinforcement learning for dynamic strategy improvement.
-- Provide REST APIs for integration with enterprise tools.
+Contact & Support
+-----------------
+- Contact form messages are saved to Google Sheets for follow-up
+- All required fields and consent are validated
 
-Author
-------
-Hoshang Sheth  
-Portfolio: https://hoshangsheth.carrd.co  
-LinkedIn: https://linkedin.com/in/hoshangsheth  
-GitHub: https://github.com/hoshangsheth
+Author: Hoshang Sheth
+For questions, support, or demo requests, use the Contact Us page in the app.
