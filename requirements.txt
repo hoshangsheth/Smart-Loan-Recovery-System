@@ -8,3 +8,4 @@ shap
 reportlab
 gspread
 oauth2client
+streamlit-option-menu
