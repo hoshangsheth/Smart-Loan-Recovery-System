@@ -1492,9 +1492,8 @@ if 'page' in globals() and page == "Contact Us":
                         "https://www.googleapis.com/auth/drive.file",
                         "https://www.googleapis.com/auth/drive"
                     ]
-                    creds = ServiceAccountCredentials.from_json_keyfile_name(
-                        "Google Sheets API/glowing-sprite-465619-m7-48b1d3968bd2.json", scope
-                    )
+                    creds_dict = st.secrets['gcp_service_account']
+                    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
                     client = gspread.authorize(creds)
                     sheet = client.open("slrs").worksheet("Sheet1")
                     sheet.append_row([
