@@ -1,82 +1,79 @@
 # Smart Loan Recovery System
 
-A Machine Learning-powered solution to optimize loan recovery strategies by predicting the most effective collection method for each borrower, reducing defaults, legal costs, and manual effort.
+A professional, logic-driven Streamlit dashboard for loan risk assessment, borrower analytics, and AI-powered recovery strategy recommendations. Includes robust UI/UX, PDF report generation, model explainability, and a business-grade contact form with Google Sheets integration.
+
+## Features
+
+- **Smart Risk Predictor:**
+  - Enter borrower details to predict risk of default and receive tailored recovery strategies.
+  - Auto-calculated fields (EMI, DPD, Collection Attempts, etc.)
+  - Robust validation (0 is valid for all fields).
+  - Professional, color-coded PDF report download with unique borrower ID.
+  - User-friendly error handling (no Python tracebacks).
+
+- **Recovery Insights Dashboard:**
+  - Visualizes borrower details, risk, and strategy in a modern dashboard.
+  - Analytical charts: EMI/Income, Collateral Coverage, Payment History, Risk Gauge.
+  - SHAP value visualization for model explainability.
+  - Dynamic, plain-language Insights Summary (SHAP + business logic).
+  - Graph-themed background for visual appeal.
+
+- **Contact Us:**
+  - Business-grade contact form with required field and consent validation.
+  - Google Sheets integration for message storage.
+  - Custom-styled input fields matching app branding.
+
+- **Branding & UI:**
+  - Custom sidebar and header with Flaticon icons.
+  - Modern, responsive CSS and layout.
+
+## Setup Instructions
+
+1. **Clone the repository or copy the project files.**
+
+2. **Install dependencies:**
+   ```
+   pip install -r requirements.txt
+   ```
+
+3. **Google Sheets Integration:**
+   - Place your Google Service Account JSON key in `Google Sheets API/` (update filename in code if needed).
+   - Share your target Google Sheet with the service account email.
+
+4. **Run the app:**
+   ```
+   streamlit run slrs.py
+   ```
+
+5. **Usage:**
+   - Use the sidebar to navigate between Smart Risk Predictor, Recovery Insights, and Contact Us.
+   - Fill in borrower details and click Predict to view results and download the PDF report.
+   - View analytics and SHAP explanations in Recovery Insights.
+   - Use Contact Us for support, demo requests, or feedback.
+
+## File Structure
+
+- `slrs.py` — Main Streamlit app
+- `requirements.txt` — Python dependencies
+- `Google Sheets API/` — Service account JSON for Google Sheets
+- `Notebooks & Strategy/`, `PKL Files/` — Model and feature files
+- `Dataset/` — Sample data
+- `Project Documents/` — Notes and workflow docs
+
+## Model & Explainability
+- XGBoost model for risk prediction (pickle file required)
+- SHAP for model explainability (waterfall plot and plain-language insights)
+
+## PDF Reports
+- Downloadable, color-coded, professional PDF for each borrower
+- Unique, robust borrower ID (no emoji or unsupported symbols)
+
+## Contact & Support
+- Contact form messages are saved to Google Sheets for follow-up
+- All required fields and consent are validated
 
 ---
 
-## Project Overview
+**Author:** Hoshang Sheth
 
-Loan recovery is often inefficient due to generic collection approaches. This project automates and personalizes recovery decisions using borrower data, machine learning, and risk segmentation.
-
-The system:
-- Identifies high-risk borrowers early
-- Suggests recovery strategies (legal, follow-up, settlement, etc.)
-- Provides actionable insights via an interactive dashboard
-
----
-
-## Core Features
-
-- **Risk Prediction**: XGBoost model to classify borrowers based on default likelihood.
-- **Feature Engineering**: Includes EMI-to-Income Ratio, Collateral Coverage, Default Severity, and more.
-- **Clustering & Segmentation**: Groups borrowers based on financial profiles and risk.
-- **Legal Action Integration**: Suggests when legal steps should be taken based on risk score and history.
-- **Streamlit App**: UI for lenders to input borrower details, get predictions, and view portfolio insights.
-
----
-
-## Tech Stack
-
-- **Python**, **Pandas**, **NumPy**, **Plotly**
-- **XGBoost**, **Random Forest**, **KMeans**
-- **Streamlit** for app deployment
-- **Scikit-learn** for preprocessing and modeling
-- **Pickle** for model serialization
-
----
-
-## Impact
-
-- Automated decision-making reduced manual effort in identifying suitable recovery strategies.
-- Early risk detection helped flag high-risk borrowers and reduce defaults.
-- Cost optimization by recommending legal action only when necessary.
-- Data-driven recovery provided real-time, explainable insights through an interactive dashboard.
-- Improved loan portfolio health and enhanced recovery rates for financial institutions.
-
-## Future Enhancements
-
-- Early warning system to notify lenders of potential defaults before they occur.
-- Automated borrower communication through SMS/email reminders for missed payments.
-- Cost-sensitive learning to balance recovery strategies with operational expenses.
-- Reinforcement learning to dynamically adapt and optimize recovery policies.
-- REST API integration for scalable use within larger fintech platforms.
-
----
-
-## Getting Started – Clone & Run Locally
-
-Follow these steps to clone the project and run it on your local machine:
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/hoshangsheth/smart-loan-recovery-system.git
-cd smart-loan-recovery-system
-```
-
-### 2. Set Up a Virtual Environment (Recommended)
-```bash
-python -m venv venv
-source venv/bin/activate      # On Windows use: venv\Scripts\activate
-```
-
-### 3. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Run the Streamlit App
-```bash
-streamlit run app.py
-```
----
+For questions, support, or demo requests, use the Contact Us page in the app.
