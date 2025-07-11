@@ -1,8 +1,10 @@
 streamlit
-pandas
 numpy
-scikit-learn
-xgboost
-matplotlib
-seaborn
+pandas
 plotly
+matplotlib
+xgboost
+shap
+reportlab
+gspread
+oauth2client
