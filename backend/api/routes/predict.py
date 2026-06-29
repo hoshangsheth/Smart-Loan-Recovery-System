@@ -42,14 +42,11 @@ def predict_risk(payload: BorrowerInput, artifacts: MLArtifacts = Depends(get_ml
     strategy_info = prediction_service.assign_recovery_strategy(risk_score, engineered.days_past_due)
 
     segmentation_vector = segmentation_service.build_segmentation_feature_vector(
-        age=payload.age,
-        monthly_income=payload.monthly_income,
-        num_dependents=payload.num_dependents,
-        loan_amount=payload.loan_amount,
-        collateral_value=payload.collateral_value,
-        outstanding_loan=payload.outstanding_loan,
-        missed_payments=payload.missed_payments,
-        engineered=engineered,
+    age=payload.age,
+    monthly_income=payload.monthly_income,
+    num_dependents=payload.num_dependents,
+    outstanding_loan=payload.outstanding_loan,
+    engineered=engineered,
     )
     segment = segmentation_service.assign_segment(artifacts, segmentation_vector)
 
