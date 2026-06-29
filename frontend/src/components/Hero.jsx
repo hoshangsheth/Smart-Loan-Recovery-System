@@ -26,19 +26,19 @@ export default function Hero() {
           transition={{ duration: 0.6 }}
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-line bg-slate/60 px-4 py-1.5 text-xs uppercase tracking-wider text-lime mb-6">
-            AI-Powered Recovery Intelligence
+            ML-Powered Recovery Intelligence
           </span>
           <h1 className="font-display text-5xl sm:text-6xl font-bold leading-[1.05] tracking-tight text-white mb-6">
             Know who'll <span className="text-lime">default</span> before they do.
           </h1>
           <p className="text-lg text-mute max-w-lg mb-8">
-            Smart Loan Recovery System scores every borrower's default risk in real time,
+            Recovia scores every borrower's default risk in real time,
             explains exactly why, and recommends the recovery strategy most likely to
-            bring the loan current — backed by SHAP-level transparency.
+            bring the loan current - backed by SHAP-level transparency.
           </p>
           <div className="flex flex-wrap gap-4">
             <Button variant="primary" onClick={() => navigate('/predictor')}>
-              Run a Risk Prediction <ArrowRight size={16} />
+              Run Risk Assessment <ArrowRight size={16} />
             </Button>
             <Button variant="ghost" onClick={() => document.getElementById('workflow')?.scrollIntoView({ behavior: 'smooth' })}>
               See how it works
@@ -55,7 +55,7 @@ export default function Hero() {
           <GlassCard className="p-10 flex flex-col items-center gap-4" hoverLift>
             <RiskGauge score={0.62} size={200} />
             <p className="text-sm text-mute text-center max-w-[220px]">
-              Live model output — risk score, category, and strategy in one prediction call.
+              Live model output - risk score, category, and strategy in one prediction call.
             </p>
           </GlassCard>
 

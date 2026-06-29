@@ -11,7 +11,7 @@ const FEATURES = [
   {
     icon: Layers,
     title: 'Borrower segmentation',
-    desc: 'A separate clustering model groups borrowers into business-meaningful profiles like "High Income, Low Default Risk" — independent of the risk score itself.',
+    desc: 'A separate clustering model groups borrowers into business-meaningful profiles like "High Income, Low Default Risk" - independent of the risk score itself.',
   },
   {
     icon: ShieldAlert,
@@ -21,7 +21,7 @@ const FEATURES = [
   {
     icon: FileBarChart,
     title: 'One-click PDF reporting',
-    desc: 'Every borrower profile, score, and strategy is ready to export as a clean, shareable report — no screenshots required.',
+    desc: 'Every borrower profile, score, and strategy is ready to export as a clean, shareable report - no screenshots required.',
   },
 ];
 
@@ -38,7 +38,7 @@ export default function FeaturesSection() {
         >
           <span className="text-xs uppercase tracking-wider text-lime">Platform</span>
           <h2 className="font-display text-4xl font-bold text-white mt-3">
-            Built for collections teams, not data scientists.
+            Built for collections professionals.
           </h2>
         </motion.div>
 

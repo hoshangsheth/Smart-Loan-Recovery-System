@@ -3,12 +3,12 @@ import { UserPlus, Wallet, Cpu, BarChart3, Lightbulb, ClipboardList, FileDown } 
 import GlassCard from './GlassCard';
 
 const STEPS = [
-  { icon: UserPlus, title: 'Enter borrower details', desc: 'Name, age, gender, dependents — the basics that shape every downstream calculation.' },
+  { icon: UserPlus, title: 'Enter borrower details', desc: 'Name, age, gender, dependents - the basics that shape every downstream calculation.' },
   { icon: Wallet, title: 'Enter financial details', desc: 'Loan type, amount, collateral, missed payments. EMI and DPD are calculated automatically.' },
   { icon: Cpu, title: 'Generate prediction', desc: 'An XGBoost model scores default probability from 10 engineered features in milliseconds.' },
   { icon: BarChart3, title: 'View AI analysis', desc: 'Risk score, category, and borrower segment land in a dashboard built for fast decisions.' },
   { icon: Lightbulb, title: 'Understand SHAP explanations', desc: 'See exactly which factors pushed risk up or down, in plain business language.' },
-  { icon: ClipboardList, title: 'Review recovery strategy', desc: 'A tailored action plan — from gentle reminders to legal escalation — based on risk and DPD.' },
+  { icon: ClipboardList, title: 'Review recovery strategy', desc: 'A tailored action plan - from gentle reminders to legal escalation - based on risk and DPD.' },
   { icon: FileDown, title: 'Download the PDF report', desc: 'A polished, shareable report with every figure, the strategy, and the borrower segment.' },
 ];
 
@@ -28,7 +28,7 @@ export default function WorkflowSection() {
             Seven steps from intake to action.
           </h2>
           <p className="text-mute">
-            Every prediction follows the same guided path — no spreadsheets, no guesswork, no
+            Every prediction follows the same guided path - no spreadsheets, no guesswork, no
             black-box scores.
           </p>
         </motion.div>

@@ -24,7 +24,7 @@ export default function Nav() {
       >
         <Link to="/" className="flex items-center gap-2 font-display font-semibold text-white">
           <ShieldCheck className="text-lime" size={20} />
-          <span>SLRS</span>
+          <span>RECOVIA</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm text-mute">
@@ -37,7 +37,7 @@ export default function Nav() {
 
         <div className="hidden md:block">
           <Button variant="primary" className="px-5 py-2 text-sm" onClick={() => navigate('/predictor')}>
-            Launch Predictor
+          Analyze Loan Risk
           </Button>
         </div>
 

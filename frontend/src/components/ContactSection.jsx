@@ -29,7 +29,7 @@ export default function ContactSection() {
           Have a portfolio to assess?
         </h2>
         <p className="text-night/70 max-w-md mx-auto mb-8">
-          Message our team directly on WhatsApp — we'll walk you through onboarding your
+          Message me directly on WhatsApp and I'll walk you through onboarding your
           borrower data.
         </p>
         <Button
@@ -37,7 +37,7 @@ export default function ContactSection() {
           className="border-night/20 text-night hover:border-night hover:text-night bg-night/5"
           onClick={() => window.open(link, '_blank', 'noopener,noreferrer')}
         >
-          <MessageCircle size={18} /> Chat on WhatsApp
+          <MessageCircle size={18} /> Converse on WhatsApp
         </Button>
       </motion.div>
     </section>
