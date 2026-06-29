@@ -66,7 +66,7 @@ export default function RiskGauge({ score = 0, size = 220, strokeWidth = 16, ani
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
         >
-          {Math.round(score * 100)}%
+          {(score * 100).toFixed(2)}%
         </motion.span>
         <span className="text-xs uppercase tracking-wider text-mute mt-1">Risk Score</span>
       </div>
