@@ -1,4 +1,4 @@
-# Recovia - AI-Powered Smart Loan Recovery System
+# Recovia - ML-Powered Smart Loan Recovery System
 
 Recovia is an AI-powered decision support platform designed to help financial institutions identify high-risk borrowers, predict loan defaults, and recommend appropriate recovery strategies. By combining machine learning with an intuitive dashboard, Recovia enables lenders to make faster, data-driven recovery decisions while reducing financial risk.
 
@@ -18,7 +18,7 @@ The platform analyzes borrower information, predicts the likelihood of default, 
 
 # Key Features
 
-* AI-powered loan default prediction
+* ML-powered loan default prediction
 * Borrower risk assessment
 * Intelligent recovery recommendations
 * Credit risk visualization dashboard
@@ -281,8 +281,6 @@ Backend
 * Model retraining pipeline
 * Authentication & user management
 * Audit logs
-* Multi-bank support
-* Real-time loan monitoring
 * Automated recovery workflows
 * Notification system
 * Cloud model storage
