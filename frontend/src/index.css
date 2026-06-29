@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  /* --- Surfaces --- */
+  --color-night: #0A0E0A;
+  --color-slate: #14181A;
+  --color-slate-soft: #181D1E;
+  --color-line: #1F2421;
+
+  /* --- Brand accent --- */
+  --color-lime: #D9FF3D;
+  --color-lime-dim: #A8C72E;
+
+  /* --- Text --- */
+  --color-mute: #7A8079;
+
+  /* --- Risk status (deliberately distinct from the lime accent) --- */
+  --color-risk-low: #4ADE80;
+  --color-risk-medium: #F5C84B;
+  --color-risk-high: #F1473B;
+  --color-risk-critical: #B91C1C;
+
+  /* --- Fonts --- */
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-night);
+  color: white;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-lime);
+  color: var(--color-night);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-night);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-lime);
+}
+
+/* Visible keyboard focus everywhere — accessibility floor */
+:focus-visible {
+  outline: 2px solid var(--color-lime);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
