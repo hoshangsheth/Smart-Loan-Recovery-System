@@ -272,18 +272,36 @@ Backend
 
 ---
 
+# Model Performance
+
+The XGBoost classifier is trained against actual observed loan outcomes
+(`Recovery_Status`: Fully Recovered vs. Partially Recovered/Written Off),
+not a proxy label. Evaluated on a held-out test set (150 borrowers, never
+seen during training):
+
+| Metric | Score |
+|---|---|
+| Accuracy | 86% |
+| Precision (at-risk class) | 93% |
+| Recall (at-risk class) | 70% |
+| F1 | 80% |
+| ROC-AUC | 0.83 |
+
+Reproducible via `backend/retrain.py`.
+
+---
+
 # Future Enhancements
 
-* Borrower segmentation
 * Explainable AI (SHAP)
 * LLM-powered recovery assistant
 * Portfolio risk monitoring
-* Model retraining pipeline
 * Authentication & user management
 * Audit logs
 * Automated recovery workflows
 * Notification system
 * Cloud model storage
+* Larger training dataset (current: 500 synthetic borrower records — expand for production-grade reliability)
 
 ---
 

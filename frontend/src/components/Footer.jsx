@@ -1,4 +1,4 @@
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -8,10 +8,27 @@ export default function Footer() {
           <ShieldCheck className="text-lime" size={18} />
           Recovia
         </div>
-        <p className="text-sm text-mute">
-          ML-assisted risk scoring for internal collections use. Not a substitute for
-          regulatory or legal advice.
-        </p>
+
+        <div className="flex flex-col sm:flex-row items-center gap-2 text-sm text-mute">
+          <span>
+            ML-assisted risk scoring for internal collections use. Not a substitute
+            for regulatory or legal advice.
+          </span>
+
+          <span className="hidden sm:inline">•</span>
+
+          <span>
+            Built by{" "}
+            <a
+              href="https://hoshangsheth.com"
+              target="_blank"
+              rel="noreferrer"
+              className="text-lime hover:underline"
+            >
+              Hoshang Sheth
+            </a>
+          </span>
+        </div>
       </div>
     </footer>
   );

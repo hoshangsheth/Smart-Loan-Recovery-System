@@ -88,9 +88,20 @@ SEGMENT_DESCRIPTIONS: dict[str, str] = {
 
 # Risk category thresholds used for the recovery STRATEGY (4 tiers, depends
 # on both risk score and Days Past Due). Mirrors `assign_recovery_strategy`.
-CRITICAL_RISK_THRESHOLD = 0.90
-HIGH_RISK_THRESHOLD = 0.75
-MEDIUM_RISK_THRESHOLD = 0.25
+#
+# RECALIBRATED July 2026 against the retrained model (trained on real
+# Recovery_Status outcomes instead of the old cluster-derived label). The
+# old model was overfit to a near-deterministic label and produced
+# probabilities pushed toward 0/1, which is why the old cutoffs (0.90/0.75)
+# lived way out in the tails. The new model is honestly uncertain — its
+# predict_proba output on this dataset ranges ~0.20-0.75 with a natural gap
+# between the 70th percentile (~0.45) and 75th percentile (~0.68). These
+# thresholds are set relative to THAT distribution. If the model is
+# retrained again on a larger/different dataset, re-check these against the
+# new probability distribution rather than assuming they still hold.
+CRITICAL_RISK_THRESHOLD = 0.72
+HIGH_RISK_THRESHOLD = 0.65
+MEDIUM_RISK_THRESHOLD = 0.32
 CRITICAL_DPD_THRESHOLD = 90
 
 # Risk category thresholds used purely for DISPLAY COLOR on the predictor
@@ -98,20 +109,21 @@ CRITICAL_DPD_THRESHOLD = 90
 # scheme from the 4-tier strategy thresholds above — the original app used
 # multiple distinct threshold schemes in different places, and this
 # refactor preserves that distinction rather than merging them for
-# "consistency".
-DISPLAY_HIGH_RISK_THRESHOLD = 0.75
-DISPLAY_MEDIUM_RISK_THRESHOLD = 0.25
+# "consistency". Recalibrated alongside the strategy thresholds above.
+DISPLAY_HIGH_RISK_THRESHOLD = 0.65
+DISPLAY_MEDIUM_RISK_THRESHOLD = 0.32
 
 # A THIRD, separate 3-band scheme used only for the Recovery Insights
 # dashboard's accent/border color. Cutoffs are expressed as risk
 # *percentage* (0-100) to match the original's `risk_pct` variable.
-DASHBOARD_HIGH_RISK_PCT = 85
-DASHBOARD_LOW_RISK_PCT = 35
+# Recalibrated to match the new model's ~20-75% output range.
+DASHBOARD_HIGH_RISK_PCT = 65
+DASHBOARD_LOW_RISK_PCT = 32
 
 # "Approaching critical zone" warning band (risk %, displayed only on the
 # predictor results page, independent of the other threshold schemes).
-NEAR_CRITICAL_PCT_LOW = 80
-NEAR_CRITICAL_PCT_HIGH = 85
+NEAR_CRITICAL_PCT_LOW = 65
+NEAR_CRITICAL_PCT_HIGH = 72
 
 RECOVERY_STRATEGIES = {
     "critical": {

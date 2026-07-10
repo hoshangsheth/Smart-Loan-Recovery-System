@@ -96,8 +96,9 @@ def collateral_coverage_insight(collateral_coverage: float) -> dict:
 def build_risk_gauge(risk_score: float) -> dict:
     """
     Gauge chart data: risk score (0-100) with the same 3 colored zones used
-    on the Recovery Insights dashboard border (0-35 green / 35-85 amber /
-    85-100 red).
+    on the Recovery Insights dashboard border (0-32 green / 32-65 amber /
+    65-100 red). Values pulled from DASHBOARD_LOW_RISK_PCT /
+    DASHBOARD_HIGH_RISK_PCT in constants.py — don't hardcode here.
     """
     risk_pct = round(risk_score * 100, 2)
     return {
