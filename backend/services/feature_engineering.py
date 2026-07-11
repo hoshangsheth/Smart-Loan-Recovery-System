@@ -1,16 +1,23 @@
 """
 Feature engineering: every derived calculation used by the predictor.
 
-Each function here mirrors a specific calculation from the original
-`slrs.py`. Keeping them as small, named, pure functions (rather than inline
-expressions in a route) is what makes them independently testable and
-reusable by the segmentation and PDF services.
+`Days_Past_Due` and `Collection_Attempts` are DELIBERATELY NOT derived here.
+
+They used to be computed from `missed_payments` via a step function capped
+at 4, while the model was trained on the real CSV columns which range
+0-10 and are almost uncorrelated with missed payments (r ~= 0.03-0.06 in
+the training data) or with each other via any fixed formula (DPD is not a
+clean multiple of missed payments either - r ~= 0.34). That mismatch meant
+every borrower with a real Collection_Attempts > 4 - which in this dataset
+is exactly the population that ends up At_Risk - had their strongest
+signal (63% of total model feature importance) silently clipped at serve
+time. There is no formula that recovers this; these are real operational
+facts (how many times collections actually contacted the borrower, how
+many actual days the account is past due) that only the recovery officer
+filling in the form knows. They are collected as direct inputs in
+`BorrowerInput` and passed straight through to `engineer_features()`.
 """
-from repository.constants import (
-    FALLBACK_LOAN_TERMS,
-    LOAN_TYPE_DEFAULTS,
-    collection_attempts_for_dpd,
-)
+from repository.constants import FALLBACK_LOAN_TERMS, LOAN_TYPE_DEFAULTS
 
 
 def get_default_loan_terms(loan_type: str) -> tuple[float, int]:
@@ -31,15 +38,6 @@ def calculate_emi(principal: float, annual_rate: float, tenure_months: int) -> f
     r = annual_rate / (12 * 100)
     emi = (principal * r * (1 + r) ** tenure_months) / ((1 + r) ** tenure_months - 1)
     return round(emi, 2)
-
-
-def calculate_days_past_due(missed_payments: int) -> int:
-    """1 missed payment = 30 days past due (business rule, not calendar DPD)."""
-    return missed_payments * 30
-
-
-def calculate_collection_attempts(missed_payments: int, days_past_due: int) -> int:
-    return collection_attempts_for_dpd(missed_payments, days_past_due)
 
 
 def calculate_emi_to_income(monthly_emi: float | None, monthly_income: float) -> float | None:
@@ -89,11 +87,17 @@ def engineer_features(
     collateral_value: float,
     monthly_income: float,
     missed_payments: int,
+    days_past_due: int,
+    collection_attempts: int,
     interest_rate: float | None,
     loan_tenure: int | None,
 ) -> EngineeredFeatures:
     """
     Run the full derived-feature pipeline for one borrower.
+
+    `days_past_due` and `collection_attempts` are real operational inputs
+    from the recovery officer, not derived from `missed_payments` - see the
+    module docstring for why that derivation was removed.
 
     If `interest_rate` / `loan_tenure` are not supplied, they default based
     on loan type (mirrors the "no custom scheme" path in the original app).
@@ -103,8 +107,6 @@ def engineer_features(
     tenure_used = loan_tenure if loan_tenure is not None else default_tenure
 
     monthly_emi = calculate_emi(loan_amount, rate_used, tenure_used)
-    days_past_due = calculate_days_past_due(missed_payments)
-    collection_attempts = calculate_collection_attempts(missed_payments, days_past_due)
     emi_to_income_ratio = calculate_emi_to_income(monthly_emi, monthly_income)
     collateral_coverage = calculate_collateral_coverage(collateral_value, loan_amount)
     default_severity = calculate_default_severity(missed_payments, days_past_due)

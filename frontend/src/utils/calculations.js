@@ -1,10 +1,20 @@
 /**
  * Client-side preview calculations, mirroring
  * backend/services/feature_engineering.py exactly. These are used only to
- * give the user live feedback (EMI, DPD, collection attempts) as they fill
- * the form — the backend independently recomputes everything during
- * prediction, so there's no risk of these two ever silently diverging in
- * a way that affects the actual result.
+ * give the user live feedback (EMI) as they fill the form — the backend
+ * independently recomputes everything during prediction, so there's no
+ * risk of these two ever silently diverging in a way that affects the
+ * actual result.
+ *
+ * `calculateDaysPastDue()` and `calculateCollectionAttempts()` used to
+ * live here, deriving both values from `missed_payments` via a formula and
+ * a step function capped at 4. They're removed: the training data shows
+ * Collection_Attempts is essentially uncorrelated with missed payments or
+ * DPD (r ~= 0.03-0.06) despite being the model's single strongest feature
+ * (~63% importance), and real DPD isn't a clean multiple of missed
+ * payments either (r ~= 0.34). Both are now collected as direct inputs
+ * from the recovery officer in BorrowerForm — see the "Days Past Due" and
+ * "Collection Attempts" fields there.
  */
 
 export function calculateEmi(principal, annualRate, tenureMonths) {
@@ -12,18 +22,6 @@ export function calculateEmi(principal, annualRate, tenureMonths) {
   const r = annualRate / (12 * 100);
   const emi = (principal * r * Math.pow(1 + r, tenureMonths)) / (Math.pow(1 + r, tenureMonths) - 1);
   return Math.round(emi * 100) / 100;
-}
-
-export function calculateDaysPastDue(missedPayments) {
-  return (missedPayments || 0) * 30;
-}
-
-export function calculateCollectionAttempts(missedPayments, daysPastDue) {
-  if (!missedPayments) return 0;
-  if (daysPastDue <= 30) return 1;
-  if (daysPastDue <= 60) return 2;
-  if (daysPastDue <= 90) return 3;
-  return 4;
 }
 
 export function calculateEmiToIncome(monthlyEmi, monthlyIncome) {

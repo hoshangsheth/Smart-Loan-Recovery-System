@@ -21,6 +21,8 @@ export default function BorrowerProfileCard({ input, borrowerId }) {
         <Row label="Dependents" value={input.num_dependents} />
         <Row label="Loan Type" value={input.loan_type} />
         <Row label="Missed Payments" value={input.missed_payments} />
+        <Row label="Days Past Due" value={input.days_past_due} />
+        <Row label="Collection Attempts" value={input.collection_attempts} />
       </dl>
     </GlassCard>
   );

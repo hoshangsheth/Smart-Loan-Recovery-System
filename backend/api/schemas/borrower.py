@@ -38,6 +38,27 @@ class BorrowerInput(BaseModel):
     collateral_value: float = Field(..., ge=0)
     outstanding_loan: float = Field(..., ge=0)
     missed_payments: int = Field(..., ge=0)
+    days_past_due: int = Field(
+        ...,
+        ge=0,
+        le=3650,
+        description=(
+            "Actual days past due, as recorded by the recovery team. Not "
+            "derived from missed_payments — real DPD in this domain is not "
+            "a clean multiple of missed payment count."
+        ),
+    )
+    collection_attempts: int = Field(
+        ...,
+        ge=0,
+        le=10,
+        description=(
+            "Actual number of collection contact attempts made to date. "
+            "This is the single strongest predictor the model uses (~63% "
+            "of feature importance) — enter the real count, not an "
+            "estimate from missed payments."
+        ),
+    )
     interest_rate: float | None = Field(None, ge=0, le=100)
     loan_tenure: int | None = Field(None, ge=1, le=360)
 

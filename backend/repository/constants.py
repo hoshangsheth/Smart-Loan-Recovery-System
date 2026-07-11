@@ -43,8 +43,13 @@ MODEL_FEATURE_ORDER = [
 ]
 
 # Feature order expected by the (separate) scaler/KMeans segmentation
-# pipeline. This is a 14-feature vector, distinct from the 10-feature model
-# input above — the two pipelines were trained independently.
+# pipeline. NOTE: this was previously (incorrectly) documented as a
+# 14-feature vector "distinct from" the model's 10-feature input. It is
+# not — retrain.py trains both the KMeans segmentation and the XGBoost
+# model on the identical 10-column FEATURES list. Kept as its own named
+# constant (rather than reusing MODEL_FEATURE_ORDER directly) only so the
+# two pipelines can be changed independently in the future without that
+# implying they're currently different.
 SEGMENTATION_FEATURE_ORDER = [
     "Age",
     "Monthly_Income",
@@ -104,6 +109,15 @@ HIGH_RISK_THRESHOLD = 0.65
 MEDIUM_RISK_THRESHOLD = 0.32
 CRITICAL_DPD_THRESHOLD = 90
 
+# Verified: these thresholds were computed via retrain.py's evaluation,
+# which reads Collection_Attempts/Days_Past_Due straight from the CSV
+# (true 0-10 range, never clamped). The serve-side bug that clamped
+# Collection_Attempts to 0-4 (now fixed - see feature_engineering.py) never
+# touched the numbers these thresholds were calibrated against, so they do
+# NOT need to be re-derived now that serving matches training. Re-running
+# predict_proba over the full dataset with true features confirms the same
+# ~0.20-0.75 range and the same gap around 0.32/0.68 cited above.
+
 # Risk category thresholds used purely for DISPLAY COLOR on the predictor
 # results card and the PDF (3 bands). This is intentionally a *different*
 # scheme from the 4-tier strategy thresholds above — the original app used
@@ -162,15 +176,12 @@ RECOVERY_STRATEGIES = {
     },
 }
 
-# Collection attempts step-function (based on Days Past Due).
-def collection_attempts_for_dpd(missed_payments: int, days_past_due: int) -> int:
-    """Mirrors the inline logic in the original predictor page exactly."""
-    if missed_payments == 0:
-        return 0
-    if days_past_due <= 30:
-        return 1
-    if 31 <= days_past_due <= 60:
-        return 2
-    if 61 <= days_past_due <= 90:
-        return 3
-    return 4
+# NOTE: there used to be a `collection_attempts_for_dpd()` step function
+# here that derived Collection_Attempts from missed payments / DPD, capped
+# at 4. It's removed. The training data shows Collection_Attempts is
+# essentially uncorrelated with missed payments or DPD (r ~= 0.03-0.06) but
+# strongly correlated with the actual outcome (r ~= 0.59), and ranges
+# 0-10 - so it's a real, independent operational fact, not something a
+# formula can reconstruct. It's now collected as a direct input
+# (see BorrowerInput.collection_attempts). Same reasoning applies to
+# Days_Past_Due, which is no longer derived as `missed_payments * 30`.

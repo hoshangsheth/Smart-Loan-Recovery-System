@@ -5,11 +5,7 @@ import GlassCard from './GlassCard';
 import Button from './Button';
 import { TextField, NumberField, SelectField, CheckboxField } from './FormFields';
 import { LOAN_TYPE_DEFAULTS, LOAN_TYPES } from '../constants/loanTypes';
-import {
-  calculateEmi,
-  calculateDaysPastDue,
-  calculateCollectionAttempts,
-} from '../utils/calculations';
+import { calculateEmi } from '../utils/calculations';
 import { formatCurrencyINR } from '../utils/risk';
 
 const STEPS = ['Borrower Details', 'Financial Details', 'Review & Predict'];
@@ -29,6 +25,8 @@ const initialForm = {
   collateral_value: '',
   outstanding_loan: '',
   missed_payments: '',
+  days_past_due: '',
+  collection_attempts: '',
 };
 
 export default function BorrowerForm({ onSubmit, isLoading, error }) {
@@ -48,8 +46,6 @@ export default function BorrowerForm({ onSubmit, isLoading, error }) {
     () => calculateEmi(Number(form.loan_amount), effectiveRate, effectiveTenure),
     [form.loan_amount, effectiveRate, effectiveTenure]
   );
-  const daysPastDue = calculateDaysPastDue(Number(form.missed_payments));
-  const collectionAttempts = calculateCollectionAttempts(Number(form.missed_payments), daysPastDue);
 
   function update(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -70,7 +66,9 @@ export default function BorrowerForm({ onSubmit, isLoading, error }) {
     form.loan_amount &&
     form.collateral_value !== '' &&
     form.outstanding_loan !== '' &&
-    form.missed_payments !== '';
+    form.missed_payments !== '' &&
+    form.days_past_due !== '' &&
+    form.collection_attempts !== '';
 
   function handleSubmit() {
     onSubmit({
@@ -85,6 +83,8 @@ export default function BorrowerForm({ onSubmit, isLoading, error }) {
       collateral_value: Number(form.collateral_value),
       outstanding_loan: Number(form.outstanding_loan),
       missed_payments: Number(form.missed_payments),
+      days_past_due: Number(form.days_past_due),
+      collection_attempts: Number(form.collection_attempts),
       interest_rate: form.custom_scheme ? Number(form.interest_rate) : null,
       loan_tenure: form.custom_scheme ? Number(form.loan_tenure) : null,
     });
@@ -139,7 +139,11 @@ export default function BorrowerForm({ onSubmit, isLoading, error }) {
         {step === 1 && (
           <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
             <h2 className="font-display text-2xl font-semibold text-white mb-1">Financial Details</h2>
-            <p className="text-sm text-mute mb-6">EMI and days past due are calculated automatically.</p>
+            <p className="text-sm text-mute mb-6">
+              EMI is calculated automatically. Days Past Due and Collection Attempts are the
+              actual current figures from the recovery team's records, not estimates — enter
+              them directly.
+            </p>
 
             <SelectField label="Loan Type" value={form.loan_type} onChange={(e) => update('loan_type', e.target.value)}>
               <option value="">Select Loan Type</option>
@@ -180,8 +184,23 @@ export default function BorrowerForm({ onSubmit, isLoading, error }) {
               <NumberField label="Collateral Value (₹)" placeholder="e.g. 200000" min={0} value={form.collateral_value} onChange={(e) => update('collateral_value', e.target.value)} />
               <NumberField label="Outstanding Loan Amount (₹)" placeholder="e.g. 150000" min={0} value={form.outstanding_loan} onChange={(e) => update('outstanding_loan', e.target.value)} />
               <NumberField label="Missed Payments" placeholder="e.g. 1" min={0} value={form.missed_payments} onChange={(e) => update('missed_payments', e.target.value)} />
-              <NumberField label="Days Past Due (auto)" value={form.missed_payments !== '' ? daysPastDue : ''} disabled hint="1 missed payment = 30 days" />
-              <NumberField label="Collection Attempts (auto)" value={form.missed_payments !== '' ? collectionAttempts : ''} disabled />
+              <NumberField
+                label="Days Past Due"
+                placeholder="e.g. 95"
+                min={0}
+                value={form.days_past_due}
+                onChange={(e) => update('days_past_due', e.target.value)}
+                hint="Actual DPD from the account record, not a calculated estimate."
+              />
+              <NumberField
+                label="Collection Attempts"
+                placeholder="e.g. 6"
+                min={0}
+                max={10}
+                value={form.collection_attempts}
+                onChange={(e) => update('collection_attempts', e.target.value)}
+                hint="Real count of contact attempts made — this drives most of the model's prediction."
+              />
             </div>
 
             {monthlyEmi != null && (
@@ -215,6 +234,8 @@ export default function BorrowerForm({ onSubmit, isLoading, error }) {
               <ReviewRow label="Collateral Value" value={formatCurrencyINR(Number(form.collateral_value) || 0)} />
               <ReviewRow label="Outstanding Loan" value={formatCurrencyINR(Number(form.outstanding_loan) || 0)} />
               <ReviewRow label="Missed Payments" value={form.missed_payments} />
+              <ReviewRow label="Days Past Due" value={form.days_past_due} />
+              <ReviewRow label="Collection Attempts" value={form.collection_attempts} />
               <ReviewRow label="Estimated EMI" value={monthlyEmi != null ? formatCurrencyINR(monthlyEmi) : '—'} />
             </dl>
 

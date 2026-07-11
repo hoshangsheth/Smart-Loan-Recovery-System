@@ -27,6 +27,8 @@ def predict_risk(payload: BorrowerInput, artifacts: MLArtifacts = Depends(get_ml
         collateral_value=payload.collateral_value,
         monthly_income=payload.monthly_income,
         missed_payments=payload.missed_payments,
+        days_past_due=payload.days_past_due,
+        collection_attempts=payload.collection_attempts,
         interest_rate=payload.interest_rate,
         loan_tenure=payload.loan_tenure,
     )
