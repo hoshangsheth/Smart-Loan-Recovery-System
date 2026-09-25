@@ -33,9 +33,11 @@ async function request(path, options = {}) {
     throw new ApiError(
       typeof details?.detail === 'string'
         ? details.detail
-        : details?.detail
-          ? JSON.stringify(details.detail)
-          : `Request failed (${res.status})`,
+        : details?.detail?.message
+          ? details.detail.message
+          : details?.detail
+            ? JSON.stringify(details.detail)
+            : `Request failed (${res.status})`,
       res.status,
       details
     );
@@ -99,6 +101,20 @@ export async function updateCaseStatus(caseId, status) {
 /** Ask Gemini for a structured case brief. Takes several seconds. */
 export async function generateCaseBrief(caseId) {
   const res = await request(`/cases/${encodeURIComponent(caseId)}/brief`, { method: 'POST' });
+  return res.json();
+}
+
+/** Consent status and AI brief allowance for the signed-in user. */
+export async function getMe() {
+  const res = await request('/me');
+  return res.json();
+}
+
+export async function acceptTerms(termsVersion) {
+  const res = await request('/me/consent', {
+    method: 'POST',
+    body: JSON.stringify({ terms_version: termsVersion }),
+  });
   return res.json();
 }
 

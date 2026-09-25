@@ -11,7 +11,7 @@ from api.schemas.borrower import BorrowerInput, PredictionResult
 from auth.supabase import CurrentUser, get_optional_user
 from db.session import get_db
 from models.loader import MLArtifacts, get_ml_artifacts
-from services import case_service
+from services import case_service, consent_service
 from services.scoring_service import score_borrower
 
 router = APIRouter(prefix="/predict", tags=["prediction"])
@@ -24,6 +24,8 @@ def predict_risk(
     user: CurrentUser | None = Depends(get_optional_user),
     db: Session = Depends(get_db),
 ) -> PredictionResult:
+    if user is not None:
+        consent_service.ensure_consent(db, user)
     result = score_borrower(payload, artifacts)
     if user is not None:
         case = case_service.create_case(db, user, result)

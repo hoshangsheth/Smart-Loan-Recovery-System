@@ -102,19 +102,42 @@ def update_status(db: Session, user: CurrentUser, case: Case, new_status: str) -
     return case
 
 
+def _briefs_since(db: Session, since: datetime, user_id: str | None = None) -> list[datetime]:
+    query = select(CaseBrief.created_at).where(CaseBrief.created_at >= since)
+    if user_id is not None:
+        query = query.where(CaseBrief.created_by == user_id)
+    return list(db.scalars(query.order_by(CaseBrief.created_at)))
+
+
+def brief_usage(db: Session, user: CurrentUser) -> dict:
+    """Rolling-24h usage; resets_at is when the oldest brief in the window drops out."""
+    window_start = datetime.now(UTC) - timedelta(hours=24)
+    mine = _briefs_since(db, window_start, user.id)
+    oldest = mine[0] if mine else None
+    if oldest is not None and oldest.tzinfo is None:
+        oldest = oldest.replace(tzinfo=UTC)
+    return {
+        "used": len(mine),
+        "limit": None if user.is_admin else settings.brief_daily_limit_per_user,
+        "resets_at": oldest + timedelta(hours=24) if oldest else None,
+    }
+
+
 def enforce_brief_quota(db: Session, user: CurrentUser) -> None:
     if user.is_admin:
         return
-    since = datetime.now(UTC) - timedelta(hours=24)
-    used = db.scalar(
-        select(func.count())
-        .select_from(CaseBrief)
-        .where(CaseBrief.created_by == user.id, CaseBrief.created_at >= since)
-    )
-    if used >= settings.brief_daily_limit_per_user:
+    usage = brief_usage(db, user)
+    if usage["used"] >= settings.brief_daily_limit_per_user:
         raise HTTPException(
             status.HTTP_429_TOO_MANY_REQUESTS,
-            f"Daily AI brief limit reached ({settings.brief_daily_limit_per_user} per 24 hours). Try again later.",
+            f"You've used all {settings.brief_daily_limit_per_user} AI briefs for the last 24 hours. "
+            "Your next one frees up 24 hours after your oldest brief.",
+        )
+    window_start = datetime.now(UTC) - timedelta(hours=24)
+    if len(_briefs_since(db, window_start)) >= settings.brief_global_daily_limit:
+        raise HTTPException(
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            "AI briefs are temporarily unavailable because today's service-wide limit was reached. Please try later.",
         )
 
 

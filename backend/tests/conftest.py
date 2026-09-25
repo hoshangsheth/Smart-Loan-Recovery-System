@@ -66,6 +66,15 @@ def _clean_tables():
             conn.execute(table.delete())
 
 
+@pytest.fixture(autouse=True)
+def _consent_granted(request, monkeypatch):
+    """Tests act as users who accepted the terms, unless marked real_consent."""
+    if request.node.get_closest_marker("real_consent") is None:
+        from services import consent_service
+
+        monkeypatch.setattr(consent_service, "has_consent", lambda db, user_id: True)
+
+
 @pytest.fixture(scope="session")
 def client():
     with TestClient(app) as c:

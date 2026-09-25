@@ -79,8 +79,15 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-3.8-flash"
     gemini_thinking_level: str = "LOW"
     gemini_timeout_ms: int = 30_000
-    # Anyone can sign up, so cap paid LLM calls per non-admin user (rolling 24h).
-    brief_daily_limit_per_user: int = 20
+    # Paid LLM calls, rolling 24h. Anonymous users get none; admins are exempt.
+    # The global cap bounds total spend even if someone creates many accounts.
+    brief_daily_limit_per_user: int = 5
+    brief_global_daily_limit: int = 100
+
+    # --- Legal ---
+    # Bump when the Terms, Privacy Policy or Responsible Recovery policy change;
+    # every user must accept the new version before using cases or AI briefs.
+    terms_version: str = "2026-09-25"
 
     # --- Contact ---
     whatsapp_number: str = "919004001598"  # international format, no '+' or spaces

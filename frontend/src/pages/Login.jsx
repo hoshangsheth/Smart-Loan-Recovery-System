@@ -7,6 +7,7 @@ import Button from '../components/Button';
 import { TextField } from '../components/FormFields';
 import { useAuth } from '../context/AuthContext';
 import { useAuthProviders } from '../hooks/useAuthProviders';
+import ConsentCheckbox from '../components/ConsentCheckbox';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -35,13 +36,14 @@ export default function Login({ mode = 'signin' }) {
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pendingConfirmation, setPendingConfirmation] = useState(null);
+  const [agreed, setAgreed] = useState(false);
 
   if (session) return <Navigate to={redirectTo} replace />;
 
   const passwordTooShort = isSignUp && password.length > 0 && password.length < MIN_PASSWORD_LENGTH;
   const passwordsDiffer = isSignUp && confirmPassword.length > 0 && password !== confirmPassword;
   const canSubmit = isSignUp
-    ? email && password.length >= MIN_PASSWORD_LENGTH && password === confirmPassword
+    ? email && password.length >= MIN_PASSWORD_LENGTH && password === confirmPassword && agreed
     : email && password;
 
   async function handleSubmit(event) {
@@ -70,7 +72,7 @@ export default function Login({ mode = 'signin' }) {
   async function handleGoogle() {
     setError(null);
     try {
-      await signInWithGoogle();
+      await signInWithGoogle({ consented: isSignUp && agreed });
     } catch (err) {
       setError(err.message);
     }
@@ -113,9 +115,14 @@ export default function Login({ mode = 'signin' }) {
           <p className="text-mute text-sm">Accounts aren't configured for this deployment yet.</p>
         ) : (
           <>
+            {isSignUp && (
+              <div className="mb-6 rounded-2xl border border-line bg-slate-soft p-4">
+                <ConsentCheckbox checked={agreed} onChange={setAgreed} />
+              </div>
+            )}
             {providers.google && (
               <>
-                <Button variant="ghost" className="w-full" onClick={handleGoogle}>
+                <Button variant="ghost" className="w-full" onClick={handleGoogle} disabled={isSignUp && !agreed}>
                   <GoogleIcon /> Continue with Google
                 </Button>
                 <div className="flex items-center gap-3 my-6 text-xs text-mute" aria-hidden="true">

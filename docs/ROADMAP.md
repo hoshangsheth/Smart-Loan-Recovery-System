@@ -60,6 +60,10 @@ Free-tier risks and how they're handled:
 ### Phase 5.5: Trustworthy risk logic ✅
 - Signal audit, calibrated monotone model, RBI SMA/NPA policy floor, auto-named segments, retrain gate and behaviour tests. See `docs/MODEL_CARD.md`.
 
+### Phase 5.6: Cost guardrails and consent ✅
+- AI briefs need a signed-in account that has accepted the current terms. Each account gets 5 per rolling 24 hours (`BRIEF_DAILY_LIMIT_PER_USER`), with a service-wide ceiling (`BRIEF_GLOBAL_DAILY_LIMIT`, default 100) that bounds total Gemini spend.
+- Terms & Conditions, Privacy Policy (DPDP Act 2023) and Responsible Recovery (RBI) pages. Consent is versioned (`TERMS_VERSION`), stored in `user_consents` and enforced by the API. Bumping the version asks every user to accept again.
+
 ### Phase 6: MLOps and observability ⏳
 - Log every prediction (already persisted from Phase 1). Nightly PSI drift job over feature distributions (GitHub Actions cron).
 - Outcome capture: officers mark a case resolved or written off, which becomes labelled training data from real outcomes and replaces the 500 synthetic rows.

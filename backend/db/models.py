@@ -91,3 +91,13 @@ class AuditLog(Base):
     entity_id: Mapped[str] = mapped_column(String(36), index=True)
     details: Mapped[dict] = mapped_column(JSONType, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+
+
+class UserConsent(Base):
+    __tablename__ = "user_consents"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(String(64), index=True)
+    terms_version: Mapped[str] = mapped_column(String(32))
+    accepted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    user_agent: Mapped[str | None] = mapped_column(String(512), nullable=True)
