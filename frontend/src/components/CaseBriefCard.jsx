@@ -29,6 +29,7 @@ export default function CaseBriefCard({ caseId, brief, borrowerFirstName, onGene
   const usage = profile?.briefs;
   const remaining = usage?.limit == null ? null : Math.max(usage.limit - usage.used, 0);
   const outOfBriefs = remaining === 0;
+  const aiDisabled = profile?.ai_briefs_enabled === false;
 
   async function handleGenerate() {
     setIsGenerating(true);
@@ -64,13 +65,21 @@ export default function CaseBriefCard({ caseId, brief, borrowerFirstName, onGene
             <p className="text-xs text-mute">Explains the model's score. It never changes it.</p>
           </div>
         </div>
-        <Button variant={brief ? 'ghost' : 'primary'} onClick={handleGenerate} disabled={isGenerating || outOfBriefs}>
-          {isGenerating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-          {isGenerating ? 'Generating…' : brief ? 'Regenerate' : 'Generate brief'}
-        </Button>
+        {!aiDisabled && (
+          <Button variant={brief ? 'ghost' : 'primary'} onClick={handleGenerate} disabled={isGenerating || outOfBriefs}>
+            {isGenerating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+            {isGenerating ? 'Generating…' : brief ? 'Regenerate' : 'Generate brief'}
+          </Button>
+        )}
       </div>
 
-      {remaining !== null && (
+      {aiDisabled && (
+        <p className="mb-4 rounded-xl border border-line bg-slate-soft px-4 py-3 text-sm text-mute" role="status">
+          AI briefs are turned off right now. Risk scores, strategies and case tracking still work as usual.
+        </p>
+      )}
+
+      {!aiDisabled && remaining !== null && (
         <p className="text-xs text-mute mb-4" aria-live="polite">
           {outOfBriefs ? 'No AI briefs left' : `${remaining} of ${usage.limit} AI briefs left`} in the last 24 hours
           {usage.resets_at &&
@@ -91,7 +100,7 @@ export default function CaseBriefCard({ caseId, brief, borrowerFirstName, onGene
         </p>
       )}
 
-      {!brief && !isGenerating && !error && (
+      {!aiDisabled && !brief && !isGenerating && !error && (
         <p className="text-mute text-sm">
           Generate a brief for a plain-language summary, the main risk drivers, prioritized next steps, and a
           compliant first-contact message.

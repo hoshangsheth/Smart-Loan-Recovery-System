@@ -80,7 +80,7 @@ def build_case_context(case: Case, predictions: list[Prediction]) -> dict:
 @lru_cache
 def get_llm_client() -> genai.Client:
     if not settings.gemini_api_key:
-        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "AI briefs are not configured (GEMINI_API_KEY unset)")
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "AI briefs are turned off right now.")
     return genai.Client(
         api_key=settings.gemini_api_key,
         http_options=types.HttpOptions(

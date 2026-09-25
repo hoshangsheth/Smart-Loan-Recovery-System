@@ -25,6 +25,7 @@ class Me(BaseModel):
     is_admin: bool
     terms_version: str
     consent_required: bool
+    ai_briefs_enabled: bool
     briefs: BriefUsage
 
 
@@ -39,6 +40,7 @@ def _me(db: Session, user: CurrentUser) -> Me:
         is_admin=user.is_admin,
         terms_version=settings.terms_version,
         consent_required=not consent_service.has_consent(db, user.id),
+        ai_briefs_enabled=bool(settings.gemini_api_key),
         briefs=case_service.brief_usage(db, user),
     )
 

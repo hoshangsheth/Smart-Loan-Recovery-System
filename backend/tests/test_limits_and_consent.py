@@ -79,3 +79,15 @@ def test_new_terms_version_requires_fresh_consent(client, monkeypatch):
     client.post("/api/v1/me/consent", json={"terms_version": settings.terms_version}, headers=headers)
     monkeypatch.setattr(settings, "terms_version", "2099-01-01")
     assert client.get("/api/v1/me", headers=headers).json()["consent_required"] is True
+
+
+def test_ai_briefs_report_disabled_without_api_key(client, monkeypatch):
+    monkeypatch.setattr(settings, "gemini_api_key", "")
+    assert client.get("/api/v1/me", headers=auth("officer-1")).json()["ai_briefs_enabled"] is False
+    case_id = _case(client, "officer-1")
+    r = client.post(f"/api/v1/cases/{case_id}/brief", headers=auth("officer-1"))
+    assert r.status_code == 503
+    assert "GEMINI" not in r.json()["detail"]
+
+    monkeypatch.setattr(settings, "gemini_api_key", "set")
+    assert client.get("/api/v1/me", headers=auth("officer-1")).json()["ai_briefs_enabled"] is True
