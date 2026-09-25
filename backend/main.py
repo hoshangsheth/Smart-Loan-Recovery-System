@@ -11,7 +11,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from api.routes import analytics, cases, contact, predict, report
+from api.routes import analytics, cases, contact, me, predict, report
 from config.settings import settings
 from db.session import get_engine
 from models.loader import get_ml_artifacts
@@ -59,6 +59,7 @@ def readiness_check() -> dict:
 
 app.include_router(predict.router, prefix=settings.api_v1_prefix)
 app.include_router(cases.router, prefix=settings.api_v1_prefix)
+app.include_router(me.router, prefix=settings.api_v1_prefix)
 app.include_router(analytics.router, prefix=settings.api_v1_prefix)
 app.include_router(report.router, prefix=settings.api_v1_prefix)
 app.include_router(contact.router, prefix=settings.api_v1_prefix)

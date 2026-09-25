@@ -5,10 +5,11 @@ from sqlalchemy.orm import Session
 
 from api.schemas.borrower import BorrowerInput, PredictionResult
 from api.schemas.case import CaseBriefOut, CaseDetail, CaseStatus, CaseStatusUpdate, CaseSummary
-from auth.supabase import CurrentUser, get_current_user
+from auth.supabase import CurrentUser
 from db.session import get_db
 from models.loader import MLArtifacts, get_ml_artifacts
 from services import brief_service, case_service
+from services.consent_service import require_consent
 from services.scoring_service import score_borrower
 
 router = APIRouter(prefix="/cases", tags=["cases"])
@@ -31,7 +32,7 @@ def list_cases(
     status: CaseStatus | None = None,
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = Depends(require_consent),
     db: Session = Depends(get_db),
 ) -> list[CaseSummary]:
     rows = case_service.list_cases(
@@ -56,7 +57,7 @@ def list_cases(
 
 
 @router.get("/{case_id}", response_model=CaseDetail)
-def get_case(case_id: str, user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)) -> CaseDetail:
+def get_case(case_id: str, user: CurrentUser = Depends(require_consent), db: Session = Depends(get_db)) -> CaseDetail:
     return _detail(case_service.get_case(db, user, case_id))
 
 
@@ -65,7 +66,7 @@ def rescore_case(
     case_id: str,
     payload: BorrowerInput,
     artifacts: MLArtifacts = Depends(get_ml_artifacts),
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = Depends(require_consent),
     db: Session = Depends(get_db),
 ) -> PredictionResult:
     case = case_service.get_case(db, user, case_id)
@@ -79,7 +80,7 @@ def rescore_case(
 def update_case_status(
     case_id: str,
     body: CaseStatusUpdate,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = Depends(require_consent),
     db: Session = Depends(get_db),
 ) -> CaseDetail:
     case = case_service.get_case(db, user, case_id)
@@ -89,7 +90,7 @@ def update_case_status(
 @router.post("/{case_id}/brief", response_model=CaseBriefOut)
 def generate_case_brief(
     case_id: str,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = Depends(require_consent),
     db: Session = Depends(get_db),
     llm: genai.Client = Depends(brief_service.get_llm_client),
 ) -> CaseBriefOut:

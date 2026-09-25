@@ -163,7 +163,7 @@ def test_brief_daily_quota_applies_to_officers_not_admins(client, monkeypatch):
         assert client.post(f"/api/v1/cases/{case_id}/brief", headers=auth("officer-1")).status_code == 200
         blocked = client.post(f"/api/v1/cases/{case_id}/brief", headers=auth("officer-1"))
         assert blocked.status_code == 429
-        assert "limit" in blocked.json()["detail"]
+        assert "used all" in blocked.json()["detail"]
         admin = auth("boss", role="admin")
         assert client.post(f"/api/v1/cases/{case_id}/brief", headers=admin).status_code == 200
         assert client.post(f"/api/v1/cases/{case_id}/brief", headers=admin).status_code == 200

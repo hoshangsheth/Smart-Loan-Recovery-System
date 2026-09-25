@@ -1,4 +1,6 @@
+import { Link } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
+import { LEGAL_LINKS } from "../constants/legal";
 
 export default function Footer() {
   return (
@@ -30,6 +32,13 @@ export default function Footer() {
           </span>
         </div>
       </div>
+      <nav aria-label="Legal" className="max-w-6xl mx-auto mt-6 flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-2 text-xs text-mute">
+        {LEGAL_LINKS.map((link) => (
+          <Link key={link.to} to={link.to} className="hover:text-lime">
+            {link.label}
+          </Link>
+        ))}
+      </nav>
     </footer>
   );
 }

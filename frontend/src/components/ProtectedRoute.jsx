@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import PageShell from './PageShell';
 
 export default function ProtectedRoute({ children }) {
-  const { isConfigured, isReady, session } = useAuth();
+  const { isConfigured, isReady, session, profile } = useAuth();
   const location = useLocation();
 
   if (!isConfigured) {
@@ -17,7 +17,7 @@ export default function ProtectedRoute({ children }) {
       </PageShell>
     );
   }
-  if (!isReady) {
+  if (!isReady || (session && (profile === undefined || profile?.consent_required))) {
     return (
       <PageShell>
         <div className="flex justify-center text-mute" role="status">
