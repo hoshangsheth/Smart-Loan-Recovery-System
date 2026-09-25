@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { RefreshCcw } from 'lucide-react';
+import { FolderOpen, RefreshCcw } from 'lucide-react';
 import Nav from '../components/Nav';
 import Button from '../components/Button';
 import RiskScoreCard from '../components/RiskScoreCard';
@@ -72,7 +72,12 @@ export default function Dashboard({ predictionState }) {
               Borrower Risk, Strategy &amp; Visual Analytics
             </h1>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            {result.case_id && (
+              <Button onClick={() => navigate(`/cases/${result.case_id}`)}>
+                <FolderOpen size={16} /> Open case
+              </Button>
+            )}
             <PdfDownloadButton result={result} input={borrowerInput} />
             <Button
               variant="ghost"

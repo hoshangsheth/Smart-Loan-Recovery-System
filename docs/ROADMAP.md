@@ -34,11 +34,11 @@ Free-tier risks and how they're handled:
 - Alembic migrations. RLS enabled on every table with no policies, so the Supabase anon key (which ships in the frontend) can't read borrower PII through PostgREST. Only the backend's direct DB connection can.
 - `/health/ready` checks the DB.
 
-### Phase 2: Auth ✅ backend / ⏳ frontend
+### Phase 2: Auth ✅
 - ✅ FastAPI verifies Supabase JWTs (JWKS for asymmetric keys, or the legacy HS256 secret).
 - ✅ Roles come from `app_metadata.role` (`officer` default, `admin` sees all cases).
 - ✅ `/predict` still works anonymously but persists nothing. Signed in, it creates a case. `/cases/*` requires auth.
-- ⏳ Frontend: Supabase JS login, attach the bearer token, and a case queue page.
+- ✅ Frontend: Supabase login (invite-only), the bearer token is attached to every API call, a case queue at `/cases`, and case detail at `/cases/:id` with status changes and risk history.
 
 ### Phase 3: LLM layer
 - ✅ **3a. AI case brief**: `POST /cases/{id}/brief`. Gemini gets the scored features, SHAP drivers, the deterministic strategy tier and the risk-score history. It returns structured JSON: a summary, risk drivers, prioritized next actions and a compliant outreach draft.
@@ -46,7 +46,7 @@ Free-tier risks and how they're handled:
   - PII minimization: borrower names are never sent to Gemini.
   - Prompt version, model, latency and token counts are stored with every brief for cost and quality tracking.
 - ✅ `scripts/bench_gemini.py` measures 3.6 / 3.7 / 3.8 Flash latency with your key. Set `GEMINI_MODEL` to the winner.
-- ⏳ 3b. Frontend "Generate AI brief" card on the case page.
+- ✅ 3b. "AI case brief" card on the case page. The borrower's name is filled into the outreach draft in the browser, so it never reaches Gemini.
 
 ### Phase 4: Grounded RAG ⏳
 - Ingest collection-policy docs (RBI Fair Practices Code, internal SOPs) into pgvector with Gemini embeddings.
@@ -63,7 +63,7 @@ Free-tier risks and how they're handled:
 - Structured JSON logs and request IDs, plus Sentry free tier for errors.
 
 ### Phase 7: Frontend completion ⏳
-- Auth screens, case queue with filters, case detail with prediction history chart, AI brief, and outreach approval.
+- Re-score from the case page, and outreach approval (with Phase 5).
 
 ## Known limitation that no phase fixes by itself
 The model is trained on 500 synthetic rows. Its reported metrics prove the
