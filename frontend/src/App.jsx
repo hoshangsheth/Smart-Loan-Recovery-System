@@ -17,6 +17,7 @@ export default function App() {
       <Route path="/predictor" element={<Predictor predictionState={predictionState} />} />
       <Route path="/dashboard" element={<Dashboard predictionState={predictionState} />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Login mode="signup" />} />
       <Route
         path="/cases"
         element={

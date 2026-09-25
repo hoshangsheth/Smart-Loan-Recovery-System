@@ -1,10 +1,13 @@
 """Case persistence, access control, and audit logging."""
+from datetime import UTC, datetime, timedelta
+
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from api.schemas.borrower import PredictionResult
 from auth.supabase import CurrentUser
+from config.settings import settings
 from db.models import AuditLog, Case, CaseBrief, Prediction
 
 
@@ -93,6 +96,22 @@ def update_status(db: Session, user: CurrentUser, case: Case, new_status: str) -
     _audit(db, user, "case.status", "case", case.id, old=old_status, new=new_status)
     db.commit()
     return case
+
+
+def enforce_brief_quota(db: Session, user: CurrentUser) -> None:
+    if user.is_admin:
+        return
+    since = datetime.now(UTC) - timedelta(hours=24)
+    used = db.scalar(
+        select(func.count())
+        .select_from(CaseBrief)
+        .where(CaseBrief.created_by == user.id, CaseBrief.created_at >= since)
+    )
+    if used >= settings.brief_daily_limit_per_user:
+        raise HTTPException(
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            f"Daily AI brief limit reached ({settings.brief_daily_limit_per_user} per 24 hours). Try again later.",
+        )
 
 
 def save_brief(db: Session, user: CurrentUser, brief: CaseBrief) -> CaseBrief:

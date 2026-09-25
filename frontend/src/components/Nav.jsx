@@ -32,9 +32,14 @@ export default function Nav() {
       </button>
     </>
   ) : (
-    <Link to="/login" onClick={() => setOpen(false)} className="hover:text-white transition-colors">
-      Sign in
-    </Link>
+    <>
+      <Link to="/login" onClick={() => setOpen(false)} className="hover:text-white transition-colors">
+        Sign in
+      </Link>
+      <Link to="/signup" onClick={() => setOpen(false)} className="text-lime hover:text-white transition-colors">
+        Sign up
+      </Link>
+    </>
   );
 
   return (

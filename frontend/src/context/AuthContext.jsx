@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext(null);
 
+const redirectUrl = () => `${window.location.origin}/cases`;
+
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [isReady, setIsReady] = useState(!supabase);
@@ -26,6 +28,23 @@ export function AuthProvider({ children }) {
       isAdmin: session?.user?.app_metadata?.role === 'admin',
       async signIn(email, password) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+      },
+      /** Resolves to true when the account still needs its email confirmed. */
+      async signUp(email, password) {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: redirectUrl() },
+        });
+        if (error) throw error;
+        return !data.session;
+      },
+      async signInWithGoogle() {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: redirectUrl() },
+        });
         if (error) throw error;
       },
       async signOut() {
