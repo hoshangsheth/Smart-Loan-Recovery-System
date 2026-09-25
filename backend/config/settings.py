@@ -79,6 +79,8 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-3.8-flash"
     gemini_thinking_level: str = "LOW"
     gemini_timeout_ms: int = 30_000
+    # Anyone can sign up, so cap paid LLM calls per non-admin user (rolling 24h).
+    brief_daily_limit_per_user: int = 20
 
     # --- Contact ---
     whatsapp_number: str = "919004001598"  # international format, no '+' or spaces

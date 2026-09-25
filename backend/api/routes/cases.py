@@ -93,5 +93,6 @@ def generate_case_brief(
     llm: genai.Client = Depends(brief_service.get_llm_client),
 ) -> CaseBriefOut:
     case = case_service.get_case(db, user, case_id)
+    case_service.enforce_brief_quota(db, user)
     brief = brief_service.generate_brief(llm, case, case.predictions, user.id)
     return CaseBriefOut.model_validate(case_service.save_brief(db, user, brief))

@@ -36,9 +36,10 @@ Free-tier risks and how they're handled:
 
 ### Phase 2: Auth ✅
 - ✅ FastAPI verifies Supabase JWTs (JWKS for asymmetric keys, or the legacy HS256 secret).
+- ✅ Anyone can sign up, so non-admin users are capped at `BRIEF_DAILY_LIMIT_PER_USER` Gemini briefs per rolling 24 hours (default 20) to protect the paid API key.
 - ✅ Roles come from `app_metadata.role` (`officer` default, `admin` sees all cases).
 - ✅ `/predict` still works anonymously but persists nothing. Signed in, it creates a case. `/cases/*` requires auth.
-- ✅ Frontend: Supabase login (invite-only), the bearer token is attached to every API call, a case queue at `/cases`, and case detail at `/cases/:id` with status changes and risk history.
+- ✅ Frontend: open sign-up (email + password with confirmation, and Google when enabled in Supabase), sign-in, the bearer token is attached to every API call, a case queue at `/cases`, and case detail at `/cases/:id` with status changes and risk history.
 
 ### Phase 3: LLM layer
 - ✅ **3a. AI case brief**: `POST /cases/{id}/brief`. Gemini gets the scored features, SHAP drivers, the deterministic strategy tier and the risk-score history. It returns structured JSON: a summary, risk drivers, prioritized next actions and a compliant outreach draft.

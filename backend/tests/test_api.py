@@ -149,3 +149,21 @@ def test_brief_generation_persists_and_keeps_pii_out_of_prompt(client):
 
     detail = client.get(f"/api/v1/cases/{case_id}", headers=auth("officer-1")).json()
     assert detail["latest_brief"]["id"] == brief["id"]
+
+
+def test_brief_daily_quota_applies_to_officers_not_admins(client, monkeypatch):
+    from config.settings import settings
+
+    monkeypatch.setattr(settings, "brief_daily_limit_per_user", 1)
+    app.dependency_overrides[get_llm_client] = lambda: FakeLLM()
+    try:
+        case_id = _create_case(client)["case_id"]
+        assert client.post(f"/api/v1/cases/{case_id}/brief", headers=auth("officer-1")).status_code == 200
+        blocked = client.post(f"/api/v1/cases/{case_id}/brief", headers=auth("officer-1"))
+        assert blocked.status_code == 429
+        assert "limit" in blocked.json()["detail"]
+        admin = auth("boss", role="admin")
+        assert client.post(f"/api/v1/cases/{case_id}/brief", headers=admin).status_code == 200
+        assert client.post(f"/api/v1/cases/{case_id}/brief", headers=admin).status_code == 200
+    finally:
+        app.dependency_overrides.clear()
