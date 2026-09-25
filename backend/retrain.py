@@ -8,18 +8,22 @@ against `Recovery_Status`, the actual observed loan outcome, so the model
 predicts real defaults/recovery failure instead of reconstructing its own
 clustering rule.
 """
-import pickle
 import json
+import pickle
 
-import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split, RandomizedSearchCV, StratifiedKFold
-from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 from sklearn.metrics import (
-    classification_report, confusion_matrix, roc_auc_score,
-    accuracy_score, precision_score, recall_score, f1_score
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
+from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold, train_test_split
+from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
 RANDOM_STATE = 42
@@ -164,4 +168,8 @@ with open("ml_artifacts/features.pkl", "wb") as f:
 with open("metrics_report.json", "w") as f:
     json.dump({"validation": valid_metrics, "test": test_metrics}, f, indent=2)
 
-print("\nSaved: xgb_tuned.pkl, scaler.pkl, kmeans.pkl, features.pkl, metrics_report.json")
+from scripts.write_manifest import write_manifest
+
+write_manifest()
+
+print("\nSaved: xgb_tuned.pkl, scaler.pkl, kmeans.pkl, features.pkl, metrics_report.json, manifest.json")
