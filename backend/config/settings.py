@@ -7,8 +7,29 @@ of calling `os.environ` or hardcoding values directly.
 """
 from functools import lru_cache
 from pathlib import Path
+from urllib.parse import quote, unquote
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def normalize_database_url(url: str) -> str:
+    """
+    Accept the connection string exactly as Supabase's dashboard shows it:
+    add the psycopg driver, URL-encode the password, and drop the brackets
+    left over from its [YOUR-PASSWORD] placeholder.
+    """
+    url = url.strip()
+    scheme, sep, rest = url.partition("://")
+    if not sep or scheme not in ("postgres", "postgresql", "postgresql+psycopg"):
+        return url
+    creds, at, host = rest.rpartition("@")
+    if at and ":" in creds:
+        user, _, password = creds.partition(":")
+        if password.startswith("[") and password.endswith("]"):
+            password = password[1:-1]
+        rest = f"{user}:{quote(unquote(password), safe='')}@{host}"
+    return f"postgresql+psycopg://{rest}"
 
 
 class Settings(BaseSettings):
@@ -37,10 +58,14 @@ class Settings(BaseSettings):
     artifact_manifest_path: Path = ml_artifacts_dir / "manifest.json"
 
     # --- Database ---
-    # Supabase: use the *session pooler* connection string (IPv4-compatible,
-    # which Render free tier needs), with the psycopg driver prefix:
-    # postgresql+psycopg://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
+    # Supabase: paste the *session pooler* string as-is (IPv4-compatible,
+    # which Render free tier needs); normalize_database_url() fixes it up.
     database_url: str = "sqlite:///./recovia.db"
+
+    @field_validator("database_url")
+    @classmethod
+    def _normalize_database_url(cls, v: str) -> str:
+        return normalize_database_url(v)
 
     # --- Auth (Supabase) ---
     # Leave supabase_jwt_secret empty for projects on asymmetric signing keys

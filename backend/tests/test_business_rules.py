@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from config.settings import settings
+from config.settings import normalize_database_url, settings
 from models import loader
 from services.feature_engineering import calculate_emi, engineer_features
 from services.prediction_service import assign_recovery_strategy, get_display_risk_band
@@ -62,3 +62,25 @@ def test_tampered_artifact_is_refused(tmp_path, monkeypatch):
             loader.get_ml_artifacts()
     finally:
         loader.get_ml_artifacts.cache_clear()
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        (
+            "postgresql://postgres.abc:p@ss#w/rd@aws-0-ap-south-1.pooler.supabase.com:5432/postgres",
+            "postgresql+psycopg://postgres.abc:p%40ss%23w%2Frd@aws-0-ap-south-1.pooler.supabase.com:5432/postgres",
+        ),
+        (
+            "  postgres://postgres.abc:[secret]@host:5432/postgres\n",
+            "postgresql+psycopg://postgres.abc:secret@host:5432/postgres",
+        ),
+        (
+            "postgresql+psycopg://postgres.abc:already%40encoded@host:5432/postgres",
+            "postgresql+psycopg://postgres.abc:already%40encoded@host:5432/postgres",
+        ),
+        ("sqlite:///./recovia.db", "sqlite:///./recovia.db"),
+    ],
+)
+def test_database_url_accepts_supabase_dashboard_format(raw, expected):
+    assert normalize_database_url(raw) == expected
