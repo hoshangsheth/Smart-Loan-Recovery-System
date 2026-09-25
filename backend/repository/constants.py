@@ -63,81 +63,39 @@ SEGMENTATION_FEATURE_ORDER = [
     "Default_Severity",
 ]
 
-# Plain-business-language descriptions for each KMeans segment.
-# The cluster ID -> name mapping itself comes from segment_names.pkl at
-# runtime; this dict supplies the longer explanation shown in the UI/PDF,
-# keyed by the segment *name* (so it stays correct even if cluster IDs are
-# ever re-ordered by a future re-training).
-SEGMENT_DESCRIPTIONS: dict[str, str] = {
-    "Moderate Income, High Loan Burden": (
-        "This borrower carries a loan that is large relative to their income. "
-        "Repayment capacity is moderate, so EMI restructuring or income "
-        "verification can meaningfully reduce risk."
-    ),
-    "High Income, Low Default Risk": (
-        "This borrower's income comfortably covers their obligations and "
-        "their historical default risk is low. Standard monitoring is "
-        "typically sufficient."
-    ),
-    "Moderate Income, Medium Risk": (
-        "This borrower sits in the middle of the risk spectrum — income is "
-        "adequate but not high, with some signs of repayment strain. Regular "
-        "check-ins help catch early warning signs."
-    ),
-    "High Loan, Higher Default Risk": (
-        "This borrower has a large loan exposure combined with elevated "
-        "historical default risk. Closer collections attention and stronger "
-        "collateral coverage are recommended."
-    ),
+# --- Risk tiers -------------------------------------------------------------
+# risk_score is a calibrated probability that the loan will NOT be fully
+# recovered (see docs/MODEL_CARD.md), so these cutoffs are policy, not
+# numbers tuned to one model's output range. They hold across retrains.
+MEDIUM_RISK_THRESHOLD = 0.30
+HIGH_RISK_THRESHOLD = 0.55
+VERY_HIGH_RISK_THRESHOLD = 0.80
+
+# Calibrated scores are clipped to this range: 500 training rows can't
+# justify claiming certainty in either direction.
+RISK_SCORE_BOUNDS = (0.02, 0.98)
+
+# RBI early-stress classification by days past due (IRACP norms):
+# SMA-0 1-30, SMA-1 31-60, SMA-2 61-90, NPA when overdue more than 90 days.
+ASSET_CLASSES = [
+    (0, "Standard"),
+    (30, "SMA-0"),
+    (60, "SMA-1"),
+    (90, "SMA-2"),
+]
+NPA_LABEL = "NPA"
+
+# Policy floors applied on top of the model: the regulatory stage of an
+# account caps how low its tier can go, whatever the model says.
+POLICY_FLOOR_BY_ASSET_CLASS = {
+    NPA_LABEL: ("high", "NPA accounts (more than 90 days past due) are never below High Risk."),
+    "SMA-2": ("medium", "SMA-2 accounts (61-90 days past due) are never below Medium Risk."),
 }
 
-# Risk category thresholds used for the recovery STRATEGY (4 tiers, depends
-# on both risk score and Days Past Due). Mirrors `assign_recovery_strategy`.
-#
-# RECALIBRATED July 2026 against the retrained model (trained on real
-# Recovery_Status outcomes instead of the old cluster-derived label). The
-# old model was overfit to a near-deterministic label and produced
-# probabilities pushed toward 0/1, which is why the old cutoffs (0.90/0.75)
-# lived way out in the tails. The new model is honestly uncertain — its
-# predict_proba output on this dataset ranges ~0.20-0.75 with a natural gap
-# between the 70th percentile (~0.45) and 75th percentile (~0.68). These
-# thresholds are set relative to THAT distribution. If the model is
-# retrained again on a larger/different dataset, re-check these against the
-# new probability distribution rather than assuming they still hold.
-CRITICAL_RISK_THRESHOLD = 0.72
-HIGH_RISK_THRESHOLD = 0.65
-MEDIUM_RISK_THRESHOLD = 0.32
-CRITICAL_DPD_THRESHOLD = 90
+TIER_ORDER = ["low", "medium", "high", "high_no_dpd", "critical"]
 
-# Verified: these thresholds were computed via retrain.py's evaluation,
-# which reads Collection_Attempts/Days_Past_Due straight from the CSV
-# (true 0-10 range, never clamped). The serve-side bug that clamped
-# Collection_Attempts to 0-4 (now fixed - see feature_engineering.py) never
-# touched the numbers these thresholds were calibrated against, so they do
-# NOT need to be re-derived now that serving matches training. Re-running
-# predict_proba over the full dataset with true features confirms the same
-# ~0.20-0.75 range and the same gap around 0.32/0.68 cited above.
-
-# Risk category thresholds used purely for DISPLAY COLOR on the predictor
-# results card and the PDF (3 bands). This is intentionally a *different*
-# scheme from the 4-tier strategy thresholds above — the original app used
-# multiple distinct threshold schemes in different places, and this
-# refactor preserves that distinction rather than merging them for
-# "consistency". Recalibrated alongside the strategy thresholds above.
-DISPLAY_HIGH_RISK_THRESHOLD = 0.65
-DISPLAY_MEDIUM_RISK_THRESHOLD = 0.32
-
-# A THIRD, separate 3-band scheme used only for the Recovery Insights
-# dashboard's accent/border color. Cutoffs are expressed as risk
-# *percentage* (0-100) to match the original's `risk_pct` variable.
-# Recalibrated to match the new model's ~20-75% output range.
-DASHBOARD_HIGH_RISK_PCT = 65
-DASHBOARD_LOW_RISK_PCT = 32
-
-# "Approaching critical zone" warning band (risk %, displayed only on the
-# predictor results page, independent of the other threshold schemes).
-NEAR_CRITICAL_PCT_LOW = 65
-NEAR_CRITICAL_PCT_HIGH = 72
+# UI color band per tier.
+TIER_BANDS = {"low": "low", "medium": "medium", "high": "high", "high_no_dpd": "high", "critical": "critical"}
 
 RECOVERY_STRATEGIES = {
     "critical": {
@@ -149,6 +107,9 @@ RECOVERY_STRATEGIES = {
     },
     "high_no_dpd": {
         "label": "High Risk",
+        "warning": (
+            "The model rates this borrower very high risk. The case becomes Critical if it crosses 90 days past due."
+        ),
         "strategy": (
             "Send pre-litigation warning, offer limited time restructuring, and escalate to senior recovery team."
         ),

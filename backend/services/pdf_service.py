@@ -14,8 +14,6 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from repository.constants import DISPLAY_HIGH_RISK_THRESHOLD, DISPLAY_MEDIUM_RISK_THRESHOLD
-
 RISK_COLOR_RED = "#d32f2f"
 RISK_COLOR_AMBER = "#D49B54"
 RISK_COLOR_GREEN = "#388e3c"
@@ -26,10 +24,10 @@ def _remove_emoji(text) -> str:
     return re.sub(r"[^\x00-\x7F]+", "", str(text))
 
 
-def _risk_color(risk_score: float) -> str:
-    if risk_score > DISPLAY_HIGH_RISK_THRESHOLD:
+def _risk_color(risk_category: str) -> str:
+    if risk_category in ("Critical Risk", "High Risk"):
         return RISK_COLOR_RED
-    if DISPLAY_MEDIUM_RISK_THRESHOLD <= risk_score <= DISPLAY_HIGH_RISK_THRESHOLD:
+    if risk_category == "Medium Risk":
         return RISK_COLOR_AMBER
     return RISK_COLOR_GREEN
 
@@ -52,7 +50,7 @@ def generate_borrower_report_pdf(report_data: dict) -> bytes:
     risk_score = report_data["risk_score"]
     risk_category_clean = _remove_emoji(report_data["risk_category"])
     strategy_clean = _remove_emoji(report_data["strategy"])
-    risk_color = _risk_color(risk_score)
+    risk_color = _risk_color(risk_category_clean)
 
     elements.append(Paragraph("<b>Smart Loan Recovery System - Borrower Risk Report</b>", styles["Title"]))
     elements.append(Spacer(1, 18))

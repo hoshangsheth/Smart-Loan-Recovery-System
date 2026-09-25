@@ -8,6 +8,7 @@ its own chart from this data. The plain-language feature descriptions and
 directional wording are ported verbatim from the original.
 """
 import numpy as np
+import pandas as pd
 
 from models.loader import MLArtifacts
 from repository.constants import MODEL_FEATURE_ORDER
@@ -49,7 +50,7 @@ def _describe_feature(display_name: str) -> str:
 
 
 def compute_shap_top_features(
-    artifacts: MLArtifacts, feature_vector: np.ndarray, top_n: int = 3
+    artifacts: MLArtifacts, feature_vector: pd.DataFrame, top_n: int = 3
 ) -> list[dict]:
     """
     Compute SHAP values for one borrower and return the top-N most
@@ -69,7 +70,7 @@ def compute_shap_top_features(
     for idx in top_idx:
         internal_name = MODEL_FEATURE_ORDER[idx]
         display_name = SHAP_DISPLAY_NAMES[internal_name]
-        value = float(feature_vector[0][idx])
+        value = float(feature_vector.iloc[0, idx])
         impact = float(row_values[idx])
         direction = "increased" if impact > 0 else "decreased"
         results.append(

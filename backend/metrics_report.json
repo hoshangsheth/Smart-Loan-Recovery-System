@@ -1,18 +1,92 @@
 {
-  "validation": {
-    "accuracy": 0.7857142857142857,
-    "precision": 0.8888888888888888,
-    "recall": 0.5517241379310345,
-    "f1": 0.6808510638297872,
-    "roc_auc": 0.8023549201009252,
-    "n": 70
+  "trained_at": "2026-09-25T13:00:32+00:00",
+  "dataset_rows": 500,
+  "target": "1 if Recovery_Status in ['Written Off', 'Partially Recovered'] else 0",
+  "positive_rate": 0.408,
+  "evaluation": "5x repeated stratified 5-fold CV; calibration refitted inside each fold",
+  "cross_validation": {
+    "calibrated_monotone_xgb": {
+      "roc_auc_mean": 0.805,
+      "roc_auc_95pct_range": [
+        0.7938,
+        0.8107
+      ],
+      "brier_mean": 0.1255,
+      "ece_mean": 0.0208
+    },
+    "baseline_logistic_collection_attempts_only": {
+      "roc_auc_mean": 0.7809,
+      "roc_auc_95pct_range": [
+        0.7792,
+        0.7826
+      ],
+      "brier_mean": 0.1519,
+      "ece_mean": 0.1581
+    },
+    "baseline_predict_base_rate": {
+      "brier_mean": 0.2415
+    }
   },
-  "test": {
-    "accuracy": 0.86,
-    "precision": 0.9347826086956522,
-    "recall": 0.7049180327868853,
-    "f1": 0.8037383177570093,
-    "roc_auc": 0.8320132621108859,
-    "n": 150
+  "univariate_feature_auc": {
+    "Age": 0.513,
+    "Monthly_Income": 0.515,
+    "Num_Dependents": 0.537,
+    "Loan_Tenure": 0.512,
+    "Interest_Rate": 0.503,
+    "Outstanding_Loan_Amount": 0.537,
+    "Collection_Attempts": 0.787,
+    "EMI_to_Income_Ratio": 0.512,
+    "Collateral_Coverage": 0.534,
+    "Default_Severity": 0.538
+  },
+  "model": {
+    "xgboost_params": {
+      "n_estimators": 200,
+      "max_depth": 2,
+      "learning_rate": 0.05,
+      "min_child_weight": 5,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "eval_metric": "logloss",
+      "random_state": 42
+    },
+    "monotone_direction": {
+      "Age": 0,
+      "Monthly_Income": -1,
+      "Num_Dependents": 1,
+      "Loan_Tenure": 1,
+      "Interest_Rate": 1,
+      "Outstanding_Loan_Amount": 1,
+      "Collection_Attempts": 1,
+      "EMI_to_Income_Ratio": 1,
+      "Collateral_Coverage": -1,
+      "Default_Severity": 1
+    }
+  },
+  "segments": {
+    "0": {
+      "name": "Severe delinquency, more dependents",
+      "description": "What sets this group apart: severe delinquency and more dependents. Median monthly income is \u20b9148,974 with an EMI-to-income ratio of 0.23. In the training data, 41% of these borrowers were not fully recovered, close to the 41% portfolio average.",
+      "size": 54,
+      "observed_at_risk_rate": 0.407
+    },
+    "1": {
+      "name": "Strong collateral, high interest rate",
+      "description": "What sets this group apart: strong collateral and high interest rate. Median monthly income is \u20b9147,022 with an EMI-to-income ratio of 0.22. In the training data, 37% of these borrowers were not fully recovered, close to the 41% portfolio average.",
+      "size": 194,
+      "observed_at_risk_rate": 0.371
+    },
+    "2": {
+      "name": "Thin collateral, mild delinquency",
+      "description": "What sets this group apart: thin collateral and mild delinquency. Median monthly income is \u20b9142,556 with an EMI-to-income ratio of 0.18. In the training data, 43% of these borrowers were not fully recovered, close to the 41% portfolio average.",
+      "size": 197,
+      "observed_at_risk_rate": 0.431
+    },
+    "3": {
+      "name": "Heavy EMI burden, lower income",
+      "description": "What sets this group apart: heavy EMI burden and lower income. Median monthly income is \u20b941,155 with an EMI-to-income ratio of 1.38. In the training data, 45% of these borrowers were not fully recovered, close to the 41% portfolio average.",
+      "size": 55,
+      "observed_at_risk_rate": 0.455
+    }
   }
 }

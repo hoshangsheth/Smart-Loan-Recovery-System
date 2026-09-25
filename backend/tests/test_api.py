@@ -34,8 +34,10 @@ def test_anonymous_predict_scores_but_persists_nothing(client):
     assert r.status_code == 200
     body = r.json()
     assert body["case_id"] is None
-    assert body["risk_category"] == "Critical Risk"
-    assert 0.7 < body["risk_score"] < 0.9
+    assert body["risk_score"] >= 0.8
+    assert body["asset_classification"] == "SMA-2"
+    assert body["risk_tier"] == "high_no_dpd"
+    assert body["risk_warning"]
     assert _count(Case) == 0
 
 
@@ -139,7 +141,7 @@ def test_brief_generation_persists_and_keeps_pii_out_of_prompt(client):
 
     assert r.status_code == 200, r.text
     brief = r.json()
-    assert brief["prompt_version"] == "brief-v1"
+    assert brief["prompt_version"] == "brief-v2"
     assert brief["input_tokens"] == 900
     assert brief["content"]["recommended_actions"][0]["channel"] == "call"
 

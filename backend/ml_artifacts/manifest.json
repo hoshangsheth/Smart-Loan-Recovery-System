@@ -1,10 +1,9 @@
 {
   "sha256": {
-    "features.pkl": "42a34255423cbf485ed1541ce17efaa31d54dc9d6d2d9c50fb1ca27dea77b84d",
-    "gender_map.pkl": "21b6d6794a7508239ed7703552a82c071730e971f997af400702540665181d06",
-    "kmeans.pkl": "c79a2283e607f16c1eadf5b906752be0cbf52e1b5a7a4cf09bde3c6907026a65",
-    "scaler.pkl": "f3a529be3df6bb745101a9c24fc9af447ccb6f4ca416595c74074faab058a7a5",
-    "segment_names.pkl": "0dc7bc1df6fb4ba5e8146da78d573f88136a976cd198c9238c43941a52da3655",
-    "xgb_tuned.pkl": "604ed1d00c6a9f2103bd083f0a614dc8af0dd28d6c2a54057737f8de59d91f51"
+    "calibrator.pkl": "ecbab1a397428ca10c19cbeffc74715f9fb27afcf812ead9336710cd4e8b78b3",
+    "kmeans.pkl": "87e49ce7f55c6b92dbd52bd0b981bdb2d208608622eb1d8bd4b4890c33f6fb51",
+    "scaler.pkl": "63a0d3b5044da89580d1c2a970d7679a13a40971ff59c5aaaf5e4c49c6fcaa31",
+    "segment_profiles.pkl": "d3cef6fe7cf75f31be6b553ad6d96f8a13c5464731214d25b1131d71e204cea7",
+    "xgb_tuned.pkl": "aadb2cfde414a4b47cdd29c2cbe9de418bf55149d67792262cffd185a7f36e97"
   }
 }

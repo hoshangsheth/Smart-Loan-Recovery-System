@@ -6,7 +6,7 @@ Here the backend only computes the underlying numbers; the frontend owns
 all rendering (Recharts/D3/etc.), matching the brief's separation between
 analytics calculations and chart UI.
 """
-from repository.constants import DASHBOARD_HIGH_RISK_PCT, DASHBOARD_LOW_RISK_PCT
+from repository.constants import HIGH_RISK_THRESHOLD, MEDIUM_RISK_THRESHOLD, VERY_HIGH_RISK_THRESHOLD
 
 
 def build_feature_percentage_chart(emi_to_income_ratio: float, collateral_coverage: float) -> dict:
@@ -95,23 +95,22 @@ def collateral_coverage_insight(collateral_coverage: float) -> dict:
 
 def build_risk_gauge(risk_score: float) -> dict:
     """
-    Gauge chart data: risk score (0-100) with the same 3 colored zones used
-    on the Recovery Insights dashboard border (0-32 green / 32-65 amber /
-    65-100 red). Values pulled from DASHBOARD_LOW_RISK_PCT /
-    DASHBOARD_HIGH_RISK_PCT in constants.py — don't hardcode here.
+    Gauge chart data: calibrated risk (0-100) with zones at the policy tier
+    cutoffs from constants.py.
     """
     risk_pct = round(risk_score * 100, 2)
     return {
         "type": "gauge",
         "value": risk_pct,
         "zones": [
-            {"range": [0, DASHBOARD_LOW_RISK_PCT], "color": "#388e3c"},
-            {"range": [DASHBOARD_LOW_RISK_PCT, DASHBOARD_HIGH_RISK_PCT], "color": "#D49B54"},
-            {"range": [DASHBOARD_HIGH_RISK_PCT, 100], "color": "#d32f2f"},
+            {"range": [0, MEDIUM_RISK_THRESHOLD * 100], "color": "#388e3c"},
+            {"range": [MEDIUM_RISK_THRESHOLD * 100, HIGH_RISK_THRESHOLD * 100], "color": "#D49B54"},
+            {"range": [HIGH_RISK_THRESHOLD * 100, VERY_HIGH_RISK_THRESHOLD * 100], "color": "#d32f2f"},
+            {"range": [VERY_HIGH_RISK_THRESHOLD * 100, 100], "color": "#8b0000"},
         ],
         "caption": (
-            f"Predicted risk of default: {risk_pct:.2f}%. Higher values indicate greater likelihood "
-            "of default and need for stronger recovery action."
+            f"Estimated probability the loan is not fully recovered: {risk_pct:.2f}%. Higher values "
+            "indicate a greater need for stronger recovery action."
         ),
     }
 

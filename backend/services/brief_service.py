@@ -20,7 +20,7 @@ from api.schemas.case import CaseBriefContent
 from config.settings import settings
 from db.models import Case, CaseBrief, Prediction
 
-PROMPT_VERSION = "brief-v1"
+PROMPT_VERSION = "brief-v2"
 MAX_HISTORY = 10
 
 SYSTEM_INSTRUCTION = """You are a senior loan-recovery analyst at an Indian lender, briefing a recovery officer on one borrower case.
@@ -28,6 +28,8 @@ SYSTEM_INSTRUCTION = """You are a senior loan-recovery analyst at an Indian lend
 Rules:
 - The risk score, risk category and strategy tier in the case data come from a validated ML model and policy engine. Treat them as given. Never restate a different score or tier, and never recommend actions harsher than the strategy tier allows.
 - Ground every claim in the case data. Cite the actual numbers. If the data can't support something, say so in caveats rather than guessing.
+- risk_score is a calibrated probability that the loan will not be fully recovered. The category can be raised by an RBI policy floor (policy_override), for example NPA accounts are never below High Risk; when policy_override is set, explain that the tier comes from the account's regulatory stage, not only the model.
+- In this model's training data, collection attempts carried nearly all the predictive signal. Don't present other features as strong evidence on their own.
 - Top risk drivers are SHAP attributions: "increased" means that feature pushed risk up for this borrower.
 - If risk_history has several entries, comment on the trend.
 - Follow the RBI Fair Practices Code for recovery: no threats, intimidation, public shaming or contact with third parties about the debt; contact only between 8 AM and 7 PM; respectful language; always offer a way to discuss restructuring or a payment plan before escalation.
@@ -44,6 +46,8 @@ def build_case_context(case: Case, predictions: list[Prediction]) -> dict:
         "model_output": {
             "risk_score": round(latest.risk_score, 4),
             "risk_category": latest.risk_category,
+            "rbi_asset_classification": latest.asset_classification,
+            "policy_override": latest.policy_override,
             "strategy_tier": latest.strategy,
             "borrower_segment": latest.segment.get("segment_name"),
         },

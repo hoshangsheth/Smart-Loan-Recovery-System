@@ -53,8 +53,8 @@ class Settings(BaseSettings):
     xgb_model_path: Path = ml_artifacts_dir / "xgb_tuned.pkl"
     scaler_path: Path = ml_artifacts_dir / "scaler.pkl"
     kmeans_path: Path = ml_artifacts_dir / "kmeans.pkl"
-    segment_names_path: Path = ml_artifacts_dir / "segment_names.pkl"
-    gender_map_path: Path = ml_artifacts_dir / "gender_map.pkl"
+    calibrator_path: Path = ml_artifacts_dir / "calibrator.pkl"
+    segment_profiles_path: Path = ml_artifacts_dir / "segment_profiles.pkl"
     artifact_manifest_path: Path = ml_artifacts_dir / "manifest.json"
 
     # --- Database ---

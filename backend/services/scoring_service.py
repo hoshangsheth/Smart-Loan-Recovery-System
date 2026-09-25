@@ -26,7 +26,7 @@ def score_borrower(payload: BorrowerInput, artifacts: MLArtifacts, borrower_id: 
         outstanding_loan=payload.outstanding_loan,
     )
     risk_score = prediction_service.predict_risk_score(artifacts, model_vector)
-    strategy_info = prediction_service.assign_recovery_strategy(risk_score, engineered.days_past_due)
+    assessment = prediction_service.assess_risk(risk_score, engineered.days_past_due)
 
     segmentation_vector = segmentation_service.build_segmentation_feature_vector(
         age=payload.age,
@@ -43,8 +43,13 @@ def score_borrower(payload: BorrowerInput, artifacts: MLArtifacts, borrower_id: 
         or generate_borrower_id(payload.loan_type.value, payload.first_name, payload.last_name),
         model_version=artifacts.model_version,
         risk_score=risk_score,
-        risk_category=strategy_info["label"],
-        strategy=strategy_info["strategy"],
+        risk_category=assessment.label,
+        risk_tier=assessment.tier,
+        risk_band=assessment.band,
+        asset_classification=assessment.asset_classification,
+        policy_override=assessment.policy_override,
+        risk_warning=assessment.warning,
+        strategy=assessment.strategy,
         calculated={
             "monthly_emi": engineered.monthly_emi or 0.0,
             "days_past_due": engineered.days_past_due,
