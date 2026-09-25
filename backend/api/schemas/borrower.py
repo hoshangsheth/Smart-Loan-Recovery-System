@@ -54,9 +54,8 @@ class BorrowerInput(BaseModel):
         le=10,
         description=(
             "Actual number of collection contact attempts made to date. "
-            "This is the single strongest predictor the model uses (~63% "
-            "of feature importance) — enter the real count, not an "
-            "estimate from missed payments."
+            "In the training data this is the only feature with real "
+            "predictive signal, so enter the true count, not an estimate."
         ),
     )
     interest_rate: float | None = Field(None, ge=0, le=100)
@@ -101,8 +100,13 @@ class PredictionResult(BaseModel):
     borrower_id: str
     case_id: str | None = Field(None, description="Set only when the caller is signed in and the case was saved.")
     model_version: str
-    risk_score: float
+    risk_score: float = Field(description="Calibrated probability that the loan will not be fully recovered.")
     risk_category: str
+    risk_tier: str = Field(description="low | medium | high | high_no_dpd | critical")
+    risk_band: str = Field(description="UI color band: low | medium | high | critical")
+    asset_classification: str = Field(description="RBI class from days past due: Standard, SMA-0/1/2 or NPA.")
+    policy_override: str | None = Field(None, description="Set when the RBI policy floor raised the model's tier.")
+    risk_warning: str | None = None
     strategy: str
     calculated: CalculatedFields
     segment: SegmentInfo

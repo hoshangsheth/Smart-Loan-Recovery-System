@@ -101,7 +101,14 @@ export default function CaseDetail() {
       )}
 
       <div className="grid lg:grid-cols-3 gap-5 mb-5">
-        <RiskScoreCard riskScore={latest.risk_score} riskCategory={latest.risk_category} />
+        <RiskScoreCard
+          riskScore={latest.risk_score}
+          riskCategory={latest.risk_category}
+          riskBand={latest.risk_band}
+          assetClassification={latest.asset_classification}
+          policyOverride={latest.policy_override}
+          warning={latest.risk_tier === 'high_no_dpd' ? 'Becomes Critical if the account crosses 90 days past due.' : null}
+        />
         <RecoveryStrategyCard strategy={latest.strategy} />
         <SegmentCard segment={latest.segment} />
       </div>

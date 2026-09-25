@@ -31,10 +31,10 @@ class MLArtifacts:
     """Bundle of every ML artifact the app needs, loaded once."""
 
     xgb_model: Any
+    calibrator: Any
     scaler: Any
     kmeans: Any
-    segment_names: dict[int, str]
-    gender_map: dict[str, int]
+    segment_profiles: dict[int, dict]
     model_version: str
 
 
@@ -66,10 +66,10 @@ def get_ml_artifacts() -> MLArtifacts:
     manifest = _load_manifest()
 
     xgb_model = _load_verified_pickle(settings.xgb_model_path, manifest)
+    calibrator = _load_verified_pickle(settings.calibrator_path, manifest)
     scaler = _load_verified_pickle(settings.scaler_path, manifest)
     kmeans = _load_verified_pickle(settings.kmeans_path, manifest)
-    segment_names = _load_verified_pickle(settings.segment_names_path, manifest)
-    gender_map = _load_verified_pickle(settings.gender_map_path, manifest)
+    segment_profiles = _load_verified_pickle(settings.segment_profiles_path, manifest)
     model_version = manifest[settings.xgb_model_path.name][:12]
 
     logger.info(
@@ -77,14 +77,14 @@ def get_ml_artifacts() -> MLArtifacts:
         type(xgb_model).__name__,
         model_version,
         getattr(kmeans, "n_clusters", "?"),
-        len(segment_names),
+        len(segment_profiles),
     )
 
     return MLArtifacts(
         xgb_model=xgb_model,
         scaler=scaler,
+        calibrator=calibrator,
         kmeans=kmeans,
-        segment_names=segment_names,
-        gender_map=gender_map,
+        segment_profiles=segment_profiles,
         model_version=model_version,
     )

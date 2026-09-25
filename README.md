@@ -304,20 +304,14 @@ Backend
 
 # Model Performance
 
-The XGBoost classifier is trained against actual observed loan outcomes
-(`Recovery_Status`: Fully Recovered vs. Partially Recovered/Written Off),
-not a proxy label. Evaluated on a held-out test set (150 borrowers, never
-seen during training):
+The risk score is a **calibrated probability that a loan will not be fully recovered**, from a monotone, additive XGBoost model. Tiers combine that probability with RBI's SMA/NPA asset classification, so an NPA account is never "Low Risk". Results come from 5× repeated stratified 5-fold cross-validation:
 
-| Metric | Score |
-|---|---|
-| Accuracy | 86% |
-| Precision (at-risk class) | 93% |
-| Recall (at-risk class) | 70% |
-| F1 | 80% |
-| ROC-AUC | 0.83 |
+| Model | ROC-AUC | Brier ↓ | Calibration error ↓ |
+|---|---|---|---|
+| Recovia (calibrated, monotone) | 0.805 | 0.126 | 0.021 |
+| Collection attempts only (baseline) | 0.781 | 0.152 | 0.158 |
 
-Reproducible via `backend/retrain.py`.
+**Honest caveat:** the training data is 500 synthetic rows in which collection attempts carry almost all of the signal. See [`docs/MODEL_CARD.md`](docs/MODEL_CARD.md) for the full audit, design choices and the guarantees enforced by tests. Reproduce with `cd backend && python retrain.py`.
 
 ---
 

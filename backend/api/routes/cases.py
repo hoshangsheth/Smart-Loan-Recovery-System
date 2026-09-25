@@ -47,6 +47,7 @@ def list_cases(
             status=case.status,
             latest_risk_score=pred.risk_score if pred else None,
             latest_risk_category=pred.risk_category if pred else None,
+            latest_risk_band=pred.risk_band if pred else None,
             created_at=case.created_at,
             updated_at=case.updated_at,
         )

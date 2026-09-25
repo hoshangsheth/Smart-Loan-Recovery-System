@@ -1,28 +1,13 @@
 import { motion } from 'framer-motion';
-import { getDashboardRiskBand, normalizeForGauge, RISK_COLORS } from '../utils/risk';
+import { bandFromScore, RISK_COLORS } from '../utils/risk';
 
 /**
- * Animated circular risk gauge — the signature visual element of the app.
- * A small static-feeling version appears in the hero; a large interactive
- * version anchors the results dashboard.
- *
- * `score` is 0-1 (the model's true predict_proba output). The arc sweeps
- * 270° (from -135° to +135°), matching a classic speedometer layout, and
- * recolors across the same three zones used by the dashboard border /
- * gauge chart on the backend.
- *
- * The ARC FILL uses `normalizeForGauge(score)`, not the raw score — the
- * model's honest output only spans ~0.20-0.75 on this dataset, so a raw
- * 0-1 mapping would visually compress every borrower into the same narrow
- * slice of the gauge. Stretching that range across the full arc makes safe
- * vs. risky borrowers visually distinct. The percentage TEXT in the center
- * always shows the true, unscaled risk score — only the arc position is
- * stretched for visual clarity.
+ * Animated circular risk gauge. `score` is the calibrated 0-1 probability and
+ * fills the 270° arc linearly. Pass the backend's `band` when you have it.
  */
-export default function RiskGauge({ score = 0, size = 220, strokeWidth = 16, animate = true }) {
-  const band = getDashboardRiskBand(score);
-  const color = RISK_COLORS[band];
-  const visualFraction = normalizeForGauge(score);
+export default function RiskGauge({ score = 0, band, size = 220, strokeWidth = 16, animate = true }) {
+  const color = RISK_COLORS[band ?? bandFromScore(score)];
+  const visualFraction = Math.min(Math.max(score, 0), 1);
 
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -76,7 +61,7 @@ export default function RiskGauge({ score = 0, size = 220, strokeWidth = 16, ani
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
         >
-          {(score * 100).toFixed(2)}%
+          {(score * 100).toFixed(1)}%
         </motion.span>
         <span className="text-xs uppercase tracking-wider text-mute mt-1">Risk Score</span>
       </div>

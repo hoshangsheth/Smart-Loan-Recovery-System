@@ -55,6 +55,10 @@ class PredictionOut(BaseModel):
     model_version: str
     risk_score: float
     risk_category: str
+    risk_tier: str | None
+    risk_band: str | None
+    asset_classification: str | None
+    policy_override: str | None
     strategy: str
     calculated: CalculatedFields
     segment: SegmentInfo
@@ -71,6 +75,7 @@ class CaseSummary(BaseModel):
     status: CaseStatus
     latest_risk_score: float | None
     latest_risk_category: str | None
+    latest_risk_band: str | None
     created_at: datetime
     updated_at: datetime
 

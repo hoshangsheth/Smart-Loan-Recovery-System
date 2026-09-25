@@ -5,7 +5,7 @@ import pytest
 from config.settings import normalize_database_url, settings
 from models import loader
 from services.feature_engineering import calculate_emi, engineer_features
-from services.prediction_service import assign_recovery_strategy, get_display_risk_band
+from services.prediction_service import assess_risk, classify_asset
 
 
 def test_emi_matches_reducing_balance_formula():
@@ -19,8 +19,15 @@ def test_emi_guard_returns_none_on_zero_inputs():
 
 def test_engineer_features_falls_back_to_loan_type_defaults():
     f = engineer_features(
-        loan_type="Home", loan_amount=1_000_000, collateral_value=1_500_000, monthly_income=100_000,
-        missed_payments=2, days_past_due=45, collection_attempts=1, interest_rate=None, loan_tenure=None,
+        loan_type="Home",
+        loan_amount=1_000_000,
+        collateral_value=1_500_000,
+        monthly_income=100_000,
+        missed_payments=2,
+        days_past_due=45,
+        collection_attempts=1,
+        interest_rate=None,
+        loan_tenure=None,
     )
     assert (f.interest_rate_used, f.loan_tenure_used) == (9.0, 180)
     assert f.collateral_coverage == 1.5
@@ -28,26 +35,45 @@ def test_engineer_features_falls_back_to_loan_type_defaults():
 
 
 @pytest.mark.parametrize(
-    ("score", "dpd", "label"),
+    ("dpd", "asset_class"),
     [
-        (0.80, 90, "Critical Risk"),
-        (0.80, 30, "High Risk"),
-        (0.70, 120, "High Risk"),
-        (0.50, 0, "Medium Risk"),
-        (0.10, 200, "Low Risk"),
+        (0, "Standard"),
+        (1, "SMA-0"),
+        (30, "SMA-0"),
+        (31, "SMA-1"),
+        (60, "SMA-1"),
+        (61, "SMA-2"),
+        (90, "SMA-2"),
+        (91, "NPA"),
     ],
 )
-def test_strategy_tiers(score, dpd, label):
-    assert assign_recovery_strategy(score, dpd)["label"] == label
+def test_rbi_asset_classification_boundaries(dpd, asset_class):
+    assert classify_asset(dpd) == asset_class
 
 
-def test_critical_requires_dpd_threshold_inclusive():
-    assert assign_recovery_strategy(0.73, 90)["label"] == "Critical Risk"
-    assert assign_recovery_strategy(0.73, 89)["label"] == "High Risk"
+@pytest.mark.parametrize(
+    ("score", "dpd", "tier", "overridden"),
+    [
+        (0.10, 0, "low", False),
+        (0.40, 0, "medium", False),
+        (0.60, 0, "high", False),
+        (0.90, 90, "high_no_dpd", False),
+        (0.90, 91, "critical", False),
+        (0.10, 75, "medium", True),
+        (0.10, 120, "high", True),
+        (0.60, 120, "high", False),
+    ],
+)
+def test_tier_is_max_of_model_and_policy_floor(score, dpd, tier, overridden):
+    assessment = assess_risk(score, dpd)
+    assert assessment.tier == tier
+    assert (assessment.policy_override is not None) == overridden
 
 
-def test_display_bands():
-    assert [get_display_risk_band(s) for s in (0.9, 0.5, 0.1)] == ["high", "medium", "low"]
+def test_critical_requires_npa():
+    assert assess_risk(0.98, 90).tier == "high_no_dpd"
+    assert assess_risk(0.98, 90).warning
+    assert assess_risk(0.98, 91).tier == "critical"
 
 
 def test_tampered_artifact_is_refused(tmp_path, monkeypatch):

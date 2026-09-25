@@ -13,7 +13,7 @@ import ShapChart from '../components/ShapChart';
 import AnalyticsCharts from '../components/AnalyticsCharts';
 import PdfDownloadButton from '../components/PdfDownloadButton';
 import { getAnalytics } from '../services/api';
-import { getDashboardRiskBand, RISK_COLORS } from '../utils/risk';
+import { resolveBand, RISK_COLORS } from '../utils/risk';
 
 export default function Dashboard({ predictionState }) {
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ export default function Dashboard({ predictionState }) {
     );
   }
 
-  const dashboardBand = getDashboardRiskBand(result.risk_score);
+  const dashboardBand = resolveBand({ band: result.risk_band, category: result.risk_category, score: result.risk_score });
   const accentColor = RISK_COLORS[dashboardBand];
 
   return (
@@ -92,7 +92,14 @@ export default function Dashboard({ predictionState }) {
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-5 mb-8">
-          <RiskScoreCard riskScore={result.risk_score} riskCategory={result.risk_category} />
+          <RiskScoreCard
+            riskScore={result.risk_score}
+            riskCategory={result.risk_category}
+            riskBand={result.risk_band}
+            assetClassification={result.asset_classification}
+            policyOverride={result.policy_override}
+            warning={result.risk_warning}
+          />
           <RecoveryStrategyCard strategy={result.strategy} />
           <SegmentCard segment={result.segment} />
         </div>

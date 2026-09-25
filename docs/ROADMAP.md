@@ -57,10 +57,12 @@ Free-tier risks and how they're handled:
 - Gemini function-calling agent with tools: `get_case_history`, `draft_outreach`, `schedule_follow_up`, `log_action`.
 - Every side effect needs officer approval and is written to `audit_log`. The agent proposes, a human sends.
 
+### Phase 5.5: Trustworthy risk logic ✅
+- Signal audit, calibrated monotone model, RBI SMA/NPA policy floor, auto-named segments, retrain gate and behaviour tests. See `docs/MODEL_CARD.md`.
+
 ### Phase 6: MLOps and observability ⏳
 - Log every prediction (already persisted from Phase 1). Nightly PSI drift job over feature distributions (GitHub Actions cron).
 - Outcome capture: officers mark a case resolved or written off, which becomes labelled training data from real outcomes and replaces the 500 synthetic rows.
-- Retrain gate in CI: block artifact updates whose held-out AUC drops below the current model's.
 - Structured JSON logs and request IDs, plus Sentry free tier for errors.
 
 ### Phase 7: Frontend completion ⏳

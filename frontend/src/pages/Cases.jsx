@@ -7,7 +7,7 @@ import Button from '../components/Button';
 import { listCases } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { CASE_STATUSES, CASE_STATUS_LABELS } from '../constants/caseStatus';
-import { formatPercent, getDisplayRiskBand, RISK_COLORS } from '../utils/risk';
+import { formatPercent, resolveBand, RISK_COLORS } from '../utils/risk';
 
 const FILTERS = [{ value: '', label: 'All' }, ...CASE_STATUSES];
 
@@ -81,7 +81,10 @@ export default function Cases() {
       {cases?.length > 0 && (
         <ul className="space-y-3">
           {cases.map((c) => {
-            const band = c.latest_risk_score == null ? null : getDisplayRiskBand(c.latest_risk_score);
+            const band =
+              c.latest_risk_score == null
+                ? null
+                : resolveBand({ band: c.latest_risk_band, category: c.latest_risk_category, score: c.latest_risk_score });
             return (
               <li key={c.id}>
                 <Link to={`/cases/${c.id}`} className="block group">
