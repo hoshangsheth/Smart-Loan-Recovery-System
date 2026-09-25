@@ -7,9 +7,17 @@ pydantic-settings==2.10.1
 numpy==2.3.1
 pandas==2.3.1
 
-scikit-learn==1.7.0
+# Must match the version the artifacts were pickled with (see ml_artifacts/manifest.json).
+scikit-learn==1.8.0
 xgboost==3.0.2
 shap==0.48.0
 
 reportlab==4.4.2
 python-multipart==0.0.20
+
+sqlalchemy==2.0.43
+psycopg[binary]==3.2.10
+alembic==1.16.5
+pyjwt[crypto]==2.10.1
+
+google-genai==2.8.0

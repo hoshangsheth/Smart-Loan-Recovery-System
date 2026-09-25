@@ -1,0 +1,10 @@
+{
+  "sha256": {
+    "features.pkl": "42a34255423cbf485ed1541ce17efaa31d54dc9d6d2d9c50fb1ca27dea77b84d",
+    "gender_map.pkl": "21b6d6794a7508239ed7703552a82c071730e971f997af400702540665181d06",
+    "kmeans.pkl": "c79a2283e607f16c1eadf5b906752be0cbf52e1b5a7a4cf09bde3c6907026a65",
+    "scaler.pkl": "f3a529be3df6bb745101a9c24fc9af447ccb6f4ca416595c74074faab058a7a5",
+    "segment_names.pkl": "0dc7bc1df6fb4ba5e8146da78d573f88136a976cd198c9238c43941a52da3655",
+    "xgb_tuned.pkl": "604ed1d00c6a9f2103bd083f0a614dc8af0dd28d6c2a54057737f8de59d91f51"
+  }
+}

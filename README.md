@@ -47,6 +47,11 @@ The platform analyzes borrower information, predicts the likelihood of default, 
 * Uvicorn
 * Pydantic
 
+## Data, Auth & AI
+
+* Supabase Postgres (SQLAlchemy, Alembic) and Supabase Auth
+* Google Gemini Flash (structured-output case briefs)
+
 ## Machine Learning
 
 * Scikit-learn
@@ -166,17 +171,36 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-Install dependencies.
+Install dependencies, apply migrations, and start the server (run from `backend/`).
 
 ```bash
-pip install -r backend/requirements.txt
+cd backend
+pip install -r requirements-dev.txt
+cp .env.example .env            # fill in DATABASE_URL, SUPABASE_URL, GEMINI_API_KEY
+alembic upgrade head            # SQLite by default; Supabase Postgres when DATABASE_URL is set
+uvicorn main:app --reload
 ```
 
-Start the FastAPI server.
+Run the checks CI runs:
 
 ```bash
-uvicorn backend.main:app --reload
+ruff check . && pytest -q
 ```
+
+### Supabase setup (free tier)
+
+1. Create a project. Copy the **Session pooler** connection string into `DATABASE_URL`, changing the scheme to `postgresql+psycopg://`.
+2. Set `SUPABASE_URL=https://<ref>.supabase.co`. Tokens are verified against the project's JWKS. Only legacy HS256 projects need `SUPABASE_JWT_SECRET`.
+3. To make someone an admin (sees every case), set `{"role": "admin"}` in their `app_metadata`.
+4. Set the `BACKEND_URL` repository variable on GitHub so the daily keepalive workflow stops the free project from pausing.
+
+### Choosing the Gemini model
+
+```bash
+GEMINI_API_KEY=... python scripts/bench_gemini.py --runs 5
+```
+
+Put the fastest model that returns valid output on every run into `GEMINI_MODEL`.
 
 API Documentation
 
@@ -218,13 +242,19 @@ http://localhost:5173
 
 Example endpoints include:
 
-| Method | Endpoint   | Description                   |
-| ------ | ---------- | ----------------------------- |
-| GET    | `/`        | Health Check                  |
-| POST   | `/predict` | Predict borrower default risk |
-| GET    | `/health`  | API Status                    |
+| Method | Endpoint | Auth | Description |
+| ------ | -------- | ---- | ----------- |
+| GET | `/health` | - | Liveness |
+| GET | `/health/ready` | - | Readiness (checks DB, returns model version) |
+| POST | `/api/v1/predict` | optional | Score a borrower. When signed in, also saves a case |
+| GET | `/api/v1/cases` | required | Case queue, highest current risk first (`?status=open`) |
+| GET | `/api/v1/cases/{id}` | required | Case detail with full scoring history and latest AI brief |
+| POST | `/api/v1/cases/{id}/predictions` | required | Re-score with updated DPD/collections data |
+| PATCH | `/api/v1/cases/{id}` | required | Change case status |
+| POST | `/api/v1/cases/{id}/brief` | required | Generate a Gemini case brief (summary, drivers, actions, outreach draft) |
+| POST | `/api/v1/analytics`, `/api/v1/report` | - | Dashboard data and PDF report |
 
-> Actual endpoints may differ depending on the current implementation.
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the phased plan.
 
 ---
 

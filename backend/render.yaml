@@ -11,4 +11,13 @@ services:
         value: https://your-frontend.vercel.app
       - key: WHATSAPP_NUMBER
         value: "919004001598"
+      - key: GEMINI_MODEL
+        value: gemini-3.8-flash
+      # Secrets: set these in the Render dashboard, never in this file.
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
     healthCheckPath: /health

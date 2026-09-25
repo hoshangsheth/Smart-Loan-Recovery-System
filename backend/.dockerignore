@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+tests/
+.pytest_cache/
+.ruff_cache/
+*.sqlite3
+*.db
+requirements-dev.txt

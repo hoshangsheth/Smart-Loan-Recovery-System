@@ -99,6 +99,8 @@ class ShapFeatureImpact(BaseModel):
 
 class PredictionResult(BaseModel):
     borrower_id: str
+    case_id: str | None = Field(None, description="Set only when the caller is signed in and the case was saved.")
+    model_version: str
     risk_score: float
     risk_category: str
     strategy: str
